@@ -7,6 +7,7 @@ dart_native_compression_task:
     - git submodule update --recursive
   install_script:
     - curl --proto '=https' --tlsv1.2 -sSf https://sh.rustup.rs | sh -s -- -y --default-toolchain stable
+    - source $HOME/.cargo/env
   test_script:
     - cd src/compression/dart_native_compression
     - flutter pub get
