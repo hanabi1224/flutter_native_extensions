@@ -8,6 +8,8 @@ dart_native_compression_task:
   install_script:
     - curl --proto '=https' --tlsv1.2 -sSf https://sh.rustup.rs | sh -s -- -y --default-toolchain stable
     - source $HOME/.cargo/env
+    - export PATH="$HOME/.cargo/bin:$PATH"
+    - cargo -V
   test_script:
     - cd src/compression/dart_native_compression
     - flutter pub get
