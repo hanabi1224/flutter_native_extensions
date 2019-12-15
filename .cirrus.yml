@@ -5,13 +5,13 @@ dart_native_compression_task:
     folder: ~/.pub-cache
   setup_script:
     - git submodule update --recursive
-    - source $HOME/.cargo/env
-    - cargo -V
   cargo_test_script:
+    - source $HOME/.cargo/env
     - cd src/compression/native_compression
     - cargo build --release --verbose
     - cargo test --release
   dart_test_script:
+    - source $HOME/.cargo/env
     - cd src/compression/dart_native_compression
     - pub get
     - pub run test
