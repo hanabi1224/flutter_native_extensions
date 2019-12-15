@@ -4,7 +4,7 @@ dart_native_compression_task:
   pub_cache:
     folder: ~/.pub-cache
   setup_script:
-    - git submodule update --recursive
+    - git submodule update --init --recursive
   cargo_test_script:
     - source $HOME/.cargo/env
     - cd src/compression/native_compression
