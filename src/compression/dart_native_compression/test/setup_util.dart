@@ -1,5 +1,4 @@
 import 'dart:ffi';
-
 import 'dart:io';
 
 final _dylibPrefix = Platform.isWindows ? '' : 'lib';
@@ -20,7 +19,7 @@ class SetupUtil {
     }
 
     final nativeDir = '../native_compression';
-    await Process.start('cargo', ['build', '--release'],
+    await Process.start('cargo', ['build', '--release', '--verbose'],
         workingDirectory: nativeDir);
     _dylib = DynamicLibrary.open('$nativeDir/target/release/$_dylibName');
   }
