@@ -8,4 +8,4 @@ dart_native_compression_task:
   test_script:
     - cd src/compression/dart_native_compression
     - pub get
-    - pub test
+    - pub run test
