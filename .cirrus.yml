@@ -3,6 +3,8 @@ dart_native_compression_task:
     image: cirrusci/flutter:latest
   pub_cache:
     folder: ~/.pub-cache
+  git_submodule_script:
+    - git submodule update --recursive
   install_script:
     - curl --proto '=https' --tlsv1.2 -sSf https://sh.rustup.rs | sh -s -- -y --default-toolchain stable
   test_script:
