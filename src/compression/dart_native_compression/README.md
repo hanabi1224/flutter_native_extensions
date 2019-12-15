@@ -4,11 +4,17 @@ A new Flutter package project.
 
 ## Getting Started
 
-This project is a starting point for a Dart
-[package](https://flutter.dev/developing-packages/),
-a library module containing code that can be shared easily across
-multiple Flutter or Dart projects.
+```dart
+import 'dart:ffi'
+import 'package:dart_native_compression/dart_native_compression.dart';
 
-For help getting started with Flutter, view our 
-[online documentation](https://flutter.dev/docs), which offers tutorials, 
-samples, guidance on mobile development, and a full API reference.
+final lz4 = Lz4Lib(lib: DynamicLibrary.open('libnative_compression.so'));
+final version = lz4.getVersioinNumber();
+print('LZ4 version number: $version');
+```
+
+To build native lib, go to [native_compression](https://github.com/hanabi1224/flutter_native_extensions/tree/master/src/compression/native_compression) directory, run
+```bash
+cargo build --release
+```
+The shared library will be under target/release . It would be libnative_compression.so, native_compression.dll, libnative_compression.dylib on linux, windows, osx respectively.
