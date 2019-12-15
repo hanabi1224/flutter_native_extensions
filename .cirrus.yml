@@ -1,0 +1,11 @@
+dart_native_compression_task:
+  container:
+    image: cirrusci/flutter:latest
+  pub_cache:
+    folder: ~/.pub-cache
+  install_script:
+    - curl --proto '=https' --tlsv1.2 -sSf https://sh.rustup.rs | sh -s -- -y --default-toolchain stable
+  test_script:
+    - cd src/dart_native_compression
+    - flutter pub get
+    - flutter pub test
