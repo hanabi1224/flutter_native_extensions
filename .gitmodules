@@ -1,0 +1,3 @@
+[submodule "src/compression/native_compression/liblz4"]
+	path = src/compression/native_compression/liblz4
+	url = https://github.com/lz4/lz4.git
