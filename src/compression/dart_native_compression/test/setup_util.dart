@@ -1,5 +1,4 @@
 import 'dart:ffi';
-
 import 'dart:io';
 
 final _dylibPrefix = Platform.isWindows ? '' : 'lib';

@@ -1,15 +1,11 @@
 dart_native_compression_task:
   container:
-    image: cirrusci/flutter:latest
+    dockerfile: .ci/FlutterRust/Dockerfile
   pub_cache:
     folder: ~/.pub-cache
   git_submodule_script:
     - git submodule update --recursive
-  install_script:
-    - curl --proto '=https' --tlsv1.2 -sSf https://sh.rustup.rs | sh -s -- -y --default-toolchain stable
   test_script:
-    - source $HOME/.cargo/env
-    - cargo -V
     - cd src/compression/dart_native_compression
-    - flutter pub get
-    - flutter pub test
+    - pub get
+    - pub test
