@@ -3,11 +3,15 @@ dart_native_compression_task:
     dockerfile: .ci/FlutterRust/Dockerfile
   pub_cache:
     folder: ~/.pub-cache
-  git_submodule_script:
+  setup_script:
     - git submodule update --recursive
-  test_script:
     - source $HOME/.cargo/env
     - cargo -V
+  cargo_test_script:
+    - cd src/compression/native_compression
+    - cargo build --release --verbose
+    - cargo test --release
+  dart_test_script:
     - cd src/compression/dart_native_compression
     - pub get
     - pub run test
