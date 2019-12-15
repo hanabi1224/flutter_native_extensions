@@ -17,4 +17,4 @@ To build native lib, go to [native_compression](https://github.com/hanabi1224/fl
 ```bash
 cargo build --release
 ```
-The shared library will be under target/release . It would be libnative_compression.so, native_compression.dll, libnative_compression.dylib on linux, windows, osx respectively.
+The shared library will be under target/release . It would be libdart_native_compression.so, dart_native_compression.dll, libdart_native_compression.dylib on linux, windows, osx respectively.

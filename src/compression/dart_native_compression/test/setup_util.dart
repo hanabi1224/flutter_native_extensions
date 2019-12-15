@@ -4,7 +4,7 @@ import 'dart:io';
 final _dylibPrefix = Platform.isWindows ? '' : 'lib';
 final _dylibExtension =
     Platform.isWindows ? '.dll' : (Platform.isMacOS ? '.dylib' : '.so');
-final _dylibName = '${_dylibPrefix}native_compression$_dylibExtension';
+final _dylibName = '${_dylibPrefix}dart_native_compression$_dylibExtension';
 DynamicLibrary _dylib;
 
 class SetupUtil {
