@@ -6,6 +6,8 @@ dart_native_compression_task:
   git_submodule_script:
     - git submodule update --recursive
   test_script:
+    - source $HOME/.cargo/env
+    - cargo -V
     - cd src/compression/dart_native_compression
     - pub get
     - pub run test
