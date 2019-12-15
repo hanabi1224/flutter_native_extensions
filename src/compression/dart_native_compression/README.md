@@ -5,7 +5,7 @@ A new Flutter package project.
 ## Getting Started
 
 ```dart
-import 'dart:ffi'
+import 'dart:ffi';
 import 'package:dart_native_compression/dart_native_compression.dart';
 
 final lz4 = Lz4Lib(lib: DynamicLibrary.open('libnative_compression.so'));
