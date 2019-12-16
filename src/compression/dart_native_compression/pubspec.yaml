@@ -6,8 +6,9 @@ homepage: https://github.com/hanabi1224/flutter_native_extensions
 environment:
   sdk: ">=2.6.0 <3.0.0"
 
-dependencies: 
+dependencies:
   ffi: 0.1.3
+  collection: ^1.14.12
 
 dev_dependencies:
   test:
