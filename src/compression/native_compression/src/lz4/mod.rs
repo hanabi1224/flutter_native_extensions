@@ -48,11 +48,6 @@ pub fn ffi_lz4f_free_decompression_context(dctx: *mut c_void) -> size_t {
 }
 
 #[no_mangle]
-pub extern "C" fn ffi_lz4_header_size(src: *const u8, src_size: size_t) -> size_t {
-    return unsafe { LZ4F_headerSize(src, src_size) };
-}
-
-#[no_mangle]
 pub extern "C" fn ffi_lz4f_header_size(src: *const u8, src_size: size_t) -> size_t {
     return unsafe { LZ4F_headerSize(src, src_size) };
 }
@@ -143,7 +138,7 @@ fn test_ffi_lz4f_compress_frame_and_decompress_frame() {
     let decompression_context_ptr = decompression_context_address as *const ();
     let decompression_context: *mut c_void = unsafe { transmute(decompression_context_ptr) };
 
-    let mut dst_size: usize = 100;
+    let mut dst_size: usize = compressed_size * 2;
     let dst_size_ptr: *mut usize = &mut dst_size;
     let mut src_size: usize = compressed_size;
     let src_size_ptr: *mut usize = &mut src_size;
