@@ -19,8 +19,10 @@ class SetupUtil {
     }
 
     final nativeDir = '../native_compression';
-    await Process.start('cargo', ['build', '--release', '--verbose'],
+    await Process.run('cargo', ['build', '--release', '--verbose'],
         workingDirectory: nativeDir);
-    _dylib = DynamicLibrary.open('$nativeDir/target/release/$_dylibName');
+    final dylibPath =
+        '${Directory.current.absolute.path}/$nativeDir/target/release/$_dylibName';
+    _dylib = DynamicLibrary.open(Uri.file(dylibPath).toFilePath());
   }
 }
