@@ -34,7 +34,7 @@ void main() async {
     assert(bound > 0);
   });
 
-  test('E2E', () {
+  test('decompressFrame', () {
     final src = [1, 2, 3, 4, 5, 6, 7, 8, 9, 0, 9, 8, 7, 6, 5, 4, 3, 2, 1];
     final compressed = lz4.compressFrame(Uint8List.fromList(src));
     print(compressed);
@@ -44,7 +44,7 @@ void main() async {
     assert(ListEquality().equals(src, decompressed));
   });
 
-  test('E2E_LargeFile', () async {
+  test('decompressFrameMultiBlock', () async {
     final src = await File.fromUri(Uri.file('akrobat.ttf')).readAsBytesSync();
     print('src: ${src.length}');
     final compressed = lz4.compressFrame(Uint8List.fromList(src));
@@ -54,4 +54,38 @@ void main() async {
     print('decompressed: ${decompressed.length}');
     assert(ListEquality().equals(src, decompressed));
   });
+
+  test('decompressFrameStreamMultiBlock', () async {
+    final src = await File.fromUri(Uri.file('akrobat.ttf')).readAsBytesSync();
+    print('src: ${src.length}');
+    final compressed = lz4.compressFrame(Uint8List.fromList(src));
+    print('compressed: ${compressed.length}');
+    assert(compressed.length > 0);
+
+    var decompressedChunkNumber = 0;
+    final decompressed = List<int>();
+    final compressedStream = _splitIntoChunks(compressed);
+    await for (final decompressedChunk
+        in lz4.decompressFrameStream(compressedStream)) {
+      decompressedChunkNumber += 1;
+      print('Decompressed chunk ${decompressedChunkNumber} received.');
+      decompressed.addAll(decompressedChunk);
+    }
+
+    print('decompressed: ${decompressed.length}');
+    assert(ListEquality().equals(src, decompressed));
+    assert(decompressedChunkNumber > 1);
+  });
+}
+
+Stream<Uint8List> _splitIntoChunks(Uint8List data,
+    {int chunkSize = 100}) async* {
+  for (var i = 0;; i++) {
+    final chunk = data.skip(chunkSize * i).take(chunkSize).toList();
+    if (chunk.length > 0) {
+      yield Uint8List.fromList(chunk);
+    } else {
+      break;
+    }
+  }
 }
