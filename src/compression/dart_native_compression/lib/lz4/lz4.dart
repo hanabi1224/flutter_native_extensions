@@ -1,7 +1,7 @@
 import 'dart:ffi';
 import 'dart:typed_data';
 
-import 'package:collection/equality.dart';
+import 'package:collection/collection.dart';
 import 'package:dart_native_compression/utils/uint8_list_utils.dart';
 import 'package:meta/meta.dart';
 import 'package:ffi/ffi.dart';

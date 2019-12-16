@@ -1,7 +1,7 @@
 import 'dart:io';
 import 'dart:typed_data';
 
-import 'package:collection/equality.dart';
+import 'package:collection/collection.dart';
 import 'package:test/test.dart';
 
 import 'package:dart_native_compression/dart_native_compression.dart';
