@@ -2,7 +2,9 @@
 [![Build status](https://img.shields.io/cirrus/github/hanabi1224/flutter_native_extensions/master)](https://cirrus-ci.com/github/hanabi1224/flutter_native_extensions)
 ======
 
-This is a dart binding to [lz4](https://github.com/lz4/lz4) v1.9.2, the compressed block and frame format are both interoperable with official C api, as well as [other](https://lz4.github.io/lz4/) interoperable ports, bindings and CLI tools.
+## LZ4
+
+The lz4 in this library contains a binding to [lz4](https://github.com/lz4/lz4) v1.9.2, the compressed block and frame format are both interoperable with official C api, as well as [other](https://lz4.github.io/lz4/) interoperable ports, bindings and CLI tools.
 
 #### Getting Started
 
@@ -38,13 +40,13 @@ await for (final decompressedChunk
 #### To get more examples
 Go to [unit test](https://github.com/hanabi1224/flutter_native_extensions/blob/master/src/compression/dart_native_compression/test/lz4_test.dart)
 
-#### To run unit tests
+## To run unit tests
 
 ```bash
 pub get && pub run test
 ```
 
-#### To build native lib
+## To build native lib
 
 go to [native_compression](https://github.com/hanabi1224/flutter_native_extensions/tree/master/src/compression/native_compression) directory, run
 ```bash
