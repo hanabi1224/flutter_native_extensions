@@ -170,12 +170,18 @@ class Lz4Lib {
         }
 
         sourceBuffer.addAll(chunk);
-        if (sourceBuffer.length >= nextSrcSize) {
+        while (sourceBuffer.length >= nextSrcSize) {
           if (srcBuffer != null) {
             free(srcBuffer);
           }
-          srcBuffer = Uint8ArrayUtils.toPointer(sourceBuffer);
-          srcSizePtr.asTypedList(1).setAll(0, [sourceBuffer.length]);
+          if (nextSrcSize == 0) {
+            srcBuffer = Uint8ArrayUtils.toPointer(sourceBuffer);
+            srcSizePtr.asTypedList(1).setAll(0, [sourceBuffer.length]);
+          } else {
+            srcBuffer =
+                Uint8ArrayUtils.toPointer(sourceBuffer.sublist(0, nextSrcSize));
+            srcSizePtr.asTypedList(1).setAll(0, [nextSrcSize]);
+          }
           dstSizePtr.asTypedList(1).setAll(0, [estimateDstBufferSize]);
           nextSrcSize = _decompressFrame(
               context, dstBuffer, dstSizePtr, srcBuffer, srcSizePtr);
@@ -190,6 +196,9 @@ class Lz4Lib {
           final decompressedChunk =
               Uint8ArrayUtils.fromPointer(dstBuffer, dstSize);
           yield Uint8List.fromList(decompressedChunk);
+          if (nextSrcSize <= 0) {
+            break;
+          }
         }
       }
     } finally {
