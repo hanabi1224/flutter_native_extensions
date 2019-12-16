@@ -170,7 +170,7 @@ class Lz4Lib {
         }
 
         sourceBuffer.addAll(chunk);
-        if (sourceBuffer.length >= nextSrcSize) {
+        while (sourceBuffer.length >= nextSrcSize) {
           if (srcBuffer != null) {
             free(srcBuffer);
           }

@@ -1,6 +1,7 @@
 import 'dart:io';
 import 'dart:typed_data';
 
+import 'package:meta/meta.dart';
 import 'package:collection/collection.dart';
 import 'package:test/test.dart';
 
@@ -56,7 +57,7 @@ void main() async {
     assert(ListEquality().equals(src, decompressed));
   });
 
-  test('decompressFrameStreamMultiBlock', () async {
+  test('decompressFrameStreamMultiBlockSmallChunk', () async {
     // http://sun.aei.polsl.pl/~sdeor/index.php?page=silesia
     final src = await File.fromUri(Uri.file('dickens')).readAsBytesSync();
     print('src: ${src.length}');
@@ -66,11 +67,35 @@ void main() async {
 
     var decompressedChunkNumber = 0;
     final decompressed = List<int>();
-    final compressedStream = _splitIntoChunks(compressed);
+    final compressedStream = _splitIntoChunks(compressed, chunkSize: 10);
     await for (final decompressedChunk
         in lz4.decompressFrameStream(compressedStream)) {
       decompressedChunkNumber += 1;
-      print('Decompressed chunk ${decompressedChunkNumber} received.');
+      // print('Decompressed chunk ${decompressedChunkNumber} received.');
+      decompressed.addAll(decompressedChunk);
+    }
+
+    print('decompressed: ${decompressed.length}');
+    assert(ListEquality().equals(src, decompressed));
+    assert(decompressedChunkNumber > 1);
+  });
+
+  test('decompressFrameStreamMultiBlockLargeChunk', () async {
+    // http://sun.aei.polsl.pl/~sdeor/index.php?page=silesia
+    final src = await File.fromUri(Uri.file('dickens')).readAsBytesSync();
+    print('src: ${src.length}');
+    final compressed = lz4.compressFrame(Uint8List.fromList(src));
+    print('compressed: ${compressed.length}');
+    assert(compressed.length > 0);
+
+    var decompressedChunkNumber = 0;
+    final decompressed = List<int>();
+    final compressedStream =
+        _splitIntoChunks(compressed, chunkSize: 1024 * 1024 * 10);
+    await for (final decompressedChunk
+        in lz4.decompressFrameStream(compressedStream)) {
+      decompressedChunkNumber += 1;
+      // print('Decompressed chunk ${decompressedChunkNumber} received.');
       decompressed.addAll(decompressedChunk);
     }
 
@@ -81,7 +106,7 @@ void main() async {
 }
 
 Stream<Uint8List> _splitIntoChunks(Uint8List data,
-    {int chunkSize = 1024}) async* {
+    {@required int chunkSize}) async* {
   for (var i = 0;; i++) {
     final chunk = data.skip(chunkSize * i).take(chunkSize).toList();
     if (chunk.length > 0) {
