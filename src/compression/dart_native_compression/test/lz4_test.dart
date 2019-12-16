@@ -62,15 +62,19 @@ void main() async {
     print('compressed: ${compressed.length}');
     assert(compressed.length > 0);
 
+    var decompressedChunkNumber = 0;
     final decompressed = List<int>();
     final compressedStream = _splitIntoChunks(compressed);
     await for (final decompressedChunk
         in lz4.decompressFrameStream(compressedStream)) {
+      decompressedChunkNumber += 1;
+      print('Decompressed chunk ${decompressedChunkNumber} received.');
       decompressed.addAll(decompressedChunk);
     }
 
     print('decompressed: ${decompressed.length}');
     assert(ListEquality().equals(src, decompressed));
+    assert(decompressedChunkNumber > 1);
   });
 }
 
