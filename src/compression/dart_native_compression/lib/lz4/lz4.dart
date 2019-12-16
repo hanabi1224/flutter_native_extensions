@@ -174,4 +174,57 @@ class Lz4Lib {
       free(dstBuffer);
     }
   }
+
+  Stream<Uint8List> decompressFrameStreamAsync(
+      Stream<Uint8List> stream) async* {
+    var isFirstChunk = true;
+    var estimateDstBufferSize = 0;
+    await for (final chunk in stream) {
+      if (isFirstChunk) {
+        isFirstChunk = false;
+        estimateDstBufferSize = _getEstimatedDecodeBufferSize(chunk);
+      }
+    }
+  }
+
+  int _getEstimatedDecodeBufferSize(Uint8List chunk) {
+    if (!ListEquality().equals(_magickHeader, chunk.sublist(0, 4)) ||
+        chunk.length < 7) {
+      throw Exception('First chunk too small');
+    }
+
+    // https://github.com/lz4/lz4/blob/v1.9.2/doc/lz4_Frame_format.md
+    var estimateDstBufferSize;
+    final flagByte = chunk[4];
+    final hasContentSize = flagByte & 0x08 > 0;
+    final hasDictId = flagByte & 0x01 > 0;
+    final srcBuffer = Uint8ArrayUtils.toPointer(chunk);
+    final headerSize = _getFrameHeaderSize(srcBuffer, chunk.length);
+    if (hasContentSize) {
+      var contentSizeBytes = headerSize - 3;
+      if (hasDictId) {
+        contentSizeBytes -= 4;
+      }
+
+      if (contentSizeBytes > 0) {
+        for (var i = 0; i < contentSizeBytes; i++) {
+          estimateDstBufferSize += (chunk[6 + i] << (8 * i));
+        }
+      }
+    }
+
+    final blockMaxSizeKey = chunk[5] >> 4 & 0x07;
+    if (_blockSizeTable.containsKey(blockMaxSizeKey)) {
+      final blockMaxSize = _blockSizeTable[blockMaxSizeKey];
+      if (estimateDstBufferSize == 0 || estimateDstBufferSize > blockMaxSize) {
+        estimateDstBufferSize = blockMaxSize;
+      }
+    }
+
+    if (estimateDstBufferSize == 0) {
+      estimateDstBufferSize = _blockSizeTable[7];
+    }
+
+    return estimateDstBufferSize;
+  }
 }
