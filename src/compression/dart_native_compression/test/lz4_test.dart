@@ -45,7 +45,8 @@ void main() async {
   });
 
   test('decompressFrameMultiBlock', () async {
-    final src = await File.fromUri(Uri.file('akrobat.ttf')).readAsBytesSync();
+    // http://sun.aei.polsl.pl/~sdeor/index.php?page=silesia
+    final src = await File.fromUri(Uri.file('dickens')).readAsBytesSync();
     print('src: ${src.length}');
     final compressed = lz4.compressFrame(Uint8List.fromList(src));
     print('compressed: ${compressed.length}');
@@ -56,7 +57,8 @@ void main() async {
   });
 
   test('decompressFrameStreamMultiBlock', () async {
-    final src = await File.fromUri(Uri.file('akrobat.ttf')).readAsBytesSync();
+    // http://sun.aei.polsl.pl/~sdeor/index.php?page=silesia
+    final src = await File.fromUri(Uri.file('dickens')).readAsBytesSync();
     print('src: ${src.length}');
     final compressed = lz4.compressFrame(Uint8List.fromList(src));
     print('compressed: ${compressed.length}');
@@ -79,7 +81,7 @@ void main() async {
 }
 
 Stream<Uint8List> _splitIntoChunks(Uint8List data,
-    {int chunkSize = 100}) async* {
+    {int chunkSize = 1024}) async* {
   for (var i = 0;; i++) {
     final chunk = data.skip(chunkSize * i).take(chunkSize).toList();
     if (chunk.length > 0) {
