@@ -1,4 +1,5 @@
 import 'dart:ffi';
+import 'dart:io';
 import 'dart:typed_data';
 
 import 'package:collection/collection.dart';
@@ -118,7 +119,7 @@ class Lz4Lib {
       srcSizePtr.asTypedList(1).setAll(0, [data.length]);
       int srcPtrOffset = 0;
       int nextSrcSize = 0;
-      final decompressed = List<int>();
+      final decompressed = BytesBuilder();
       do {
         dstSizePtr.asTypedList(1).setAll(0, [estimateDstBufferSize]);
         nextSrcSize = _decompressFrame(context, dstBuffer, dstSizePtr,
@@ -126,10 +127,10 @@ class Lz4Lib {
         final srcSize = srcSizePtr.elementAt(0).value;
         srcPtrOffset += srcSize;
         final dstSize = dstSizePtr.elementAt(0).value;
-        final tmpList = Uint8ArrayUtils.fromPointer(dstBuffer, dstSize);
-        decompressed.addAll(tmpList);
+        final dstBufferView = dstBuffer.asTypedList(dstSize);
+        decompressed.add(dstBufferView);
       } while (nextSrcSize > 0);
-      return Uint8List.fromList(decompressed);
+      return decompressed.takeBytes();
     } finally {
       _freeDecompressionContext(context);
       free(contextPtr);
@@ -153,7 +154,7 @@ class Lz4Lib {
     Pointer<Uint8> dstBuffer;
 
     int nextSrcSize = 0;
-    var sourceBuffer = List<int>();
+    var sourceBufferBuilder = BytesBuilder();
     var isFirstChunk = true;
     try {
       await for (final chunk in stream) {
@@ -169,33 +170,40 @@ class Lz4Lib {
           throw Exception('Error: $nextSrcSize');
         }
 
-        sourceBuffer.addAll(chunk);
-        while (sourceBuffer.length >= nextSrcSize) {
+        sourceBufferBuilder.add(chunk);
+        while (sourceBufferBuilder.length >= nextSrcSize) {
           if (srcBuffer != null) {
             free(srcBuffer);
           }
           if (nextSrcSize == 0) {
-            srcBuffer = Uint8ArrayUtils.toPointer(sourceBuffer);
-            srcSizePtr.asTypedList(1).setAll(0, [sourceBuffer.length]);
-          } else {
             srcBuffer =
-                Uint8ArrayUtils.toPointer(sourceBuffer.sublist(0, nextSrcSize));
+                Uint8ArrayUtils.toPointer(sourceBufferBuilder.toBytes());
+            srcSizePtr.asTypedList(1).setAll(0, [sourceBufferBuilder.length]);
+          } else {
+            final tmpBuffer = sourceBufferBuilder.toBytes();
+            srcBuffer = Uint8ArrayUtils.toPointer(
+                Uint8List.view(tmpBuffer.buffer, 0, nextSrcSize));
             srcSizePtr.asTypedList(1).setAll(0, [nextSrcSize]);
           }
           dstSizePtr.asTypedList(1).setAll(0, [estimateDstBufferSize]);
           nextSrcSize = _decompressFrame(
               context, dstBuffer, dstSizePtr, srcBuffer, srcSizePtr);
           final consumedSrcSize = srcSizePtr.elementAt(0).value;
-          if (consumedSrcSize >= sourceBuffer.length) {
-            sourceBuffer.clear();
+          if (consumedSrcSize >= sourceBufferBuilder.length) {
+            sourceBufferBuilder.clear();
           } else {
-            sourceBuffer = sourceBuffer.sublist(consumedSrcSize);
+            final tmpBuffer = sourceBufferBuilder.takeBytes();
+            final remaining = Uint8List.view(tmpBuffer.buffer, consumedSrcSize,
+                tmpBuffer.length - consumedSrcSize);
+            sourceBufferBuilder.clear();
+            sourceBufferBuilder.add(remaining);
           }
 
           final dstSize = dstSizePtr.elementAt(0).value;
-          final decompressedChunk =
-              Uint8ArrayUtils.fromPointer(dstBuffer, dstSize);
-          yield Uint8List.fromList(decompressedChunk);
+          final dstBufferView = dstBuffer.asTypedList(dstSize);
+          final decompressedChunkBuilder = BytesBuilder();
+          decompressedChunkBuilder.add(dstBufferView);
+          yield decompressedChunkBuilder.takeBytes();
           if (nextSrcSize <= 0) {
             break;
           }
