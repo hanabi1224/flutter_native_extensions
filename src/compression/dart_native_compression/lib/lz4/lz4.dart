@@ -56,20 +56,6 @@ class Lz4Lib {
                 Uint64 Function(Pointer, Pointer<Uint8>, Pointer<Uint64>,
                     Pointer<Uint8>, Pointer<Uint64>)>>('ffi_lz4f_decompress')
         .asFunction();
-
-    // _compressFast = lib
-    //     .lookup<
-    //         NativeFunction<
-    //             Int32 Function(Pointer<Uint8>, Pointer<Uint8>, Int32, Int32,
-    //                 Int32)>>('ffi_lz4_compress_fast')
-    //     .asFunction();
-
-    // _decompressSafe = lib
-    //     .lookup<
-    //         NativeFunction<
-    //             Int32 Function(Pointer<Uint8>, Pointer<Uint8>, Int32,
-    //                 Int32)>>('ffi_lz4_decompress_safe')
-    //     .asFunction();
   }
 
   int Function() _getVersionNumber;
@@ -170,8 +156,8 @@ class Lz4Lib {
       final decompressed = List<int>();
       do {
         dstSizePtr.asTypedList(1).setAll(0, [estimateDstBufferSize]);
-        nextSrcSize = _decompressFrame(
-            context, dstBuffer, dstSizePtr, srcBuffer.elementAt(srcPtrOffset), srcSizePtr);
+        nextSrcSize = _decompressFrame(context, dstBuffer, dstSizePtr,
+            srcBuffer.elementAt(srcPtrOffset), srcSizePtr);
         final srcSize = srcSizePtr.elementAt(0).value;
         srcPtrOffset += srcSize;
         final dstSize = dstSizePtr.elementAt(0).value;
