@@ -1,21 +1,20 @@
 import 'dart:ffi';
+import 'dart:io';
+import 'dart:typed_data';
 import 'package:ffi/ffi.dart';
 
 class Uint8ArrayUtils {
-  static List<int> fromPointer(Pointer<Uint8> ptr, int length) {
+  static Uint8List fromPointer(Pointer<Uint8> ptr, int length) {
     final view = ptr.asTypedList(length);
-    final buffer = List<int>();
-    for (var i = 0; i < length; i++) {
-      buffer.add(view[i]);
-    }
-
-    return buffer;
+    final builder = BytesBuilder();
+    builder.add(view);
+    return builder.takeBytes();
   }
 
-  static Pointer<Uint8> toPointer(List<int> buffer) {
-    final ptr = allocate<Uint8>(count: buffer.length);
-    final byteList = ptr.asTypedList(buffer.length);
-    byteList.setAll(0, buffer);
+  static Pointer<Uint8> toPointer(Uint8List bytes) {
+    final ptr = allocate<Uint8>(count: bytes.length);
+    final byteList = ptr.asTypedList(bytes.length);
+    byteList.setAll(0, bytes);
     return ptr.cast();
   }
 }

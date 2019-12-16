@@ -1,4 +1,5 @@
 import 'dart:io';
+import 'dart:math';
 import 'dart:typed_data';
 
 import 'package:meta/meta.dart';
@@ -107,8 +108,10 @@ void main() async {
 
 Stream<Uint8List> _splitIntoChunks(Uint8List data,
     {@required int chunkSize}) async* {
-  for (var i = 0;; i++) {
-    final chunk = data.skip(chunkSize * i).take(chunkSize).toList();
+  final byteBuffer = data.buffer;
+  for (var i = 0; chunkSize * i < byteBuffer.lengthInBytes; i++) {
+    final chunk = Uint8List.view(byteBuffer, chunkSize * i,
+        min(byteBuffer.lengthInBytes - (chunkSize * i), chunkSize));
     if (chunk.length > 0) {
       yield Uint8List.fromList(chunk);
     } else {
