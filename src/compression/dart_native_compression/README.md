@@ -4,7 +4,7 @@
 
 ## LZ4
 
-The lz4 in this library contains a binding to [lz4](https://github.com/lz4/lz4) v1.9.2, the compressed block and frame format are both interoperable with official C api, as well as [other](https://lz4.github.io/lz4/) interoperable ports, bindings and CLI tools.
+The lz4 in this library is a ffi binding to [lz4](https://github.com/lz4/lz4) v1.9.2, the compressed block and frame format are both interoperable with official C api, as well as [other](https://lz4.github.io/lz4/) interoperable ports, bindings and CLI tools.
 
 #### Getting Started
 
