@@ -1,0 +1,14 @@
+name: dart_native_compression_bench
+description: dart_native_compression_bench
+version: 1.0.0
+
+environment:
+  sdk: '>=2.6.0 <3.0.0'
+
+dependencies:
+  benchmark_harness: any
+  dart_native_compression:
+    path: ../
+
+dev_dependencies:
+  test: ^1.9.4
