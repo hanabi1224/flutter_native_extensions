@@ -15,19 +15,19 @@ void main() async {
   test('getVersioinNumber', () {
     final version = lz4.getVersioinNumber();
     print('LZ4 version number: $version');
-    assert(version > 0);
+    assert(version == 10902);
   });
 
   test('getVersionString', () {
     final version = lz4.getVersionString();
     print('LZ4 version string: $version');
-    assert(version != null && !version.isEmpty);
+    assert(version == '1.9.2');
   });
 
   test('getFrameVersionNumber', () {
     final version = lz4.getFrameVersionNumber();
     print('LZ4 frame version: $version');
-    assert(version > 0);
+    assert(version == 100);
   });
 
   test('getCompressFrameBound', () {

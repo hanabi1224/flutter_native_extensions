@@ -108,7 +108,7 @@ class Lz4Lib {
 
     final contextPtr = allocate<Uint64>(count: 1);
     _createDecompressionContext(contextPtr);
-    final context = Pointer.fromAddress(contextPtr.elementAt(0).value);
+    final context = Pointer.fromAddress(contextPtr[0]);
 
     final dstSizePtr = allocate<Uint64>(count: 1);
     final srcSizePtr = allocate<Uint64>(count: 1);
@@ -124,9 +124,9 @@ class Lz4Lib {
         dstSizePtr.asTypedList(1).setAll(0, [estimateDstBufferSize]);
         nextSrcSize = _decompressFrame(context, dstBuffer, dstSizePtr,
             srcBuffer.elementAt(srcPtrOffset), srcSizePtr);
-        final srcSize = srcSizePtr.elementAt(0).value;
+        final srcSize = srcSizePtr[0];
         srcPtrOffset += srcSize;
-        final dstSize = dstSizePtr.elementAt(0).value;
+        final dstSize = dstSizePtr[0];
         final dstBufferView = dstBuffer.asTypedList(dstSize);
         decompressed.add(dstBufferView);
       } while (nextSrcSize > 0);
@@ -144,7 +144,7 @@ class Lz4Lib {
   Stream<Uint8List> decompressFrameStream(Stream<Uint8List> stream) async* {
     final contextPtr = allocate<Uint64>(count: 1);
     _createDecompressionContext(contextPtr);
-    final context = Pointer.fromAddress(contextPtr.elementAt(0).value);
+    final context = Pointer.fromAddress(contextPtr[0]);
 
     final dstSizePtr = allocate<Uint64>(count: 1);
     final srcSizePtr = allocate<Uint64>(count: 1);
@@ -188,7 +188,7 @@ class Lz4Lib {
           dstSizePtr.asTypedList(1).setAll(0, [estimateDstBufferSize]);
           nextSrcSize = _decompressFrame(
               context, dstBuffer, dstSizePtr, srcBuffer, srcSizePtr);
-          final consumedSrcSize = srcSizePtr.elementAt(0).value;
+          final consumedSrcSize = srcSizePtr[0];
           if (consumedSrcSize >= sourceBufferBuilder.length) {
             sourceBufferBuilder.clear();
           } else {
@@ -199,7 +199,7 @@ class Lz4Lib {
             sourceBufferBuilder.add(remaining);
           }
 
-          final dstSize = dstSizePtr.elementAt(0).value;
+          final dstSize = dstSizePtr[0];
           final dstBufferView = dstBuffer.asTypedList(dstSize);
           final decompressedChunkBuilder = BytesBuilder();
           decompressedChunkBuilder.add(dstBufferView);
