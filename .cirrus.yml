@@ -17,3 +17,8 @@ dart_native_compression_task:
     - cd src/compression/dart_native_compression
     - pub get
     - pub run test
+  dart_bench_script:
+    - source $HOME/.cargo/env
+    - cd src/compression/dart_native_compression/bench
+    - pub get
+    - dart main.dart
