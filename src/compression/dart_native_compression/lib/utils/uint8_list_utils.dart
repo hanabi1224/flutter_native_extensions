@@ -6,7 +6,7 @@ import 'package:ffi/ffi.dart';
 class Uint8ArrayUtils {
   static Uint8List fromPointer(Pointer<Uint8> ptr, int length) {
     final view = ptr.asTypedList(length);
-    final builder = BytesBuilder();
+    final builder = BytesBuilder(copy: false);
     builder.add(view);
     return builder.takeBytes();
   }
