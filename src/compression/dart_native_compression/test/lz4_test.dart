@@ -67,7 +67,7 @@ void main() async {
     assert(compressed.length > 0);
 
     var decompressedChunkNumber = 0;
-    final decompressedBuilder = BytesBuilder();
+    final decompressedBuilder = BytesBuilder(copy: false);
     final compressedStream = _splitIntoChunks(compressed, chunkSize: 10);
     await for (final decompressedChunk
         in lz4.decompressFrameStream(compressedStream)) {
@@ -90,7 +90,7 @@ void main() async {
     assert(compressed.length > 0);
 
     var decompressedChunkNumber = 0;
-    final decompressedBuilder = BytesBuilder();
+    final decompressedBuilder = BytesBuilder(copy: false);
     final compressedStream =
         _splitIntoChunks(compressed, chunkSize: 1024 * 1024 * 10);
     await for (final decompressedChunk
