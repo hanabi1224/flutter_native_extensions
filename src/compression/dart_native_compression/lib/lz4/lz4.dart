@@ -195,7 +195,6 @@ class Lz4Lib {
             final tmpBuffer = sourceBufferBuilder.takeBytes();
             final remaining = Uint8List.view(tmpBuffer.buffer, consumedSrcSize,
                 tmpBuffer.length - consumedSrcSize);
-            sourceBufferBuilder.clear();
             sourceBufferBuilder.add(remaining);
           }
 
