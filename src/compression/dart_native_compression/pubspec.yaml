@@ -9,7 +9,7 @@ environment:
 
 dependencies:
   ffi: ^0.1.3
-  collection: ^1.40.0
+  collection: ^1.14.13
 
 dev_dependencies:
   test: any
