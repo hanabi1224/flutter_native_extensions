@@ -1,6 +1,6 @@
 name: dart_native_compression
 description: A dart binding to native compression libraries
-version: 1.0.0
+version: 1.0.0+1
 homepage: https://github.com/hanabi1224/flutter_native_extensions/tree/master/src/compression/dart_native_compression
 publish_to: https://pub.dev/
 
@@ -10,6 +10,7 @@ environment:
 dependencies:
   ffi: ^0.1.3
   collection: ^1.14.13
+  meta: ^1.2.4
 
 dev_dependencies:
   test: any
