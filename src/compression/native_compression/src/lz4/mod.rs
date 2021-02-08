@@ -1,5 +1,4 @@
 use libc::{c_char, c_int, c_uint, c_void, size_t};
-use std::mem::transmute;
 use std::ptr;
 
 mod native;
@@ -82,14 +81,27 @@ pub extern "C" fn ffi_lz4f_decompress(
     };
 }
 
+// Use cargo test -- --nocapture to show stdout/stderr
+
+#[cfg(test)]
+use std::ffi::CStr;
+#[cfg(test)]
+use std::mem::transmute;
+
 #[test]
 fn test_ffi_lz4_version_number() {
-    ffi_lz4_version_number();
+    let version = ffi_lz4_version_number();
+    println!("lz4 version number: {}", version);
+    assert_eq!(version, 10903);
 }
 
 #[test]
 fn test_ffi_lz4_version_string() {
-    ffi_lz4_version_string();
+    let version = ffi_lz4_version_string();
+    let version_c_str = unsafe { CStr::from_ptr(version) };
+    let version_str = version_c_str.to_str().unwrap();
+    println!("lz4 version string: {:?}", version_str);
+    assert_eq!(version_str, "1.9.3");
 }
 
 #[test]
