@@ -11,7 +11,7 @@ dart_native_compression_task:
     - source $HOME/.cargo/env
     - cd src/compression/native_compression
     - cargo build --release --verbose
-    - cargo test --release
+    - cargo test --release -- --nocapture
   dart_test_script:
     - source $HOME/.cargo/env
     - cd src/compression/dart_native_compression

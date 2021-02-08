@@ -15,13 +15,13 @@ void main() async {
   test('getVersioinNumber', () {
     final version = lz4.getVersioinNumber();
     print('LZ4 version number: $version');
-    assert(version == 10902);
+    assert(version == 10903);
   });
 
   test('getVersionString', () {
     final version = lz4.getVersionString();
     print('LZ4 version string: $version');
-    assert(version == '1.9.2');
+    assert(version == '1.9.3');
   });
 
   test('getFrameVersionNumber', () {
