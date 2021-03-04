@@ -7,4 +7,4 @@ This repo contains several extension packages for dart / flutter using great dar
 
 name | native | dart | flutter 
 ---|---|---|--|
-lz4 compression | [native](https://github.com/hanabi1224/flutter_native_extensions/tree/master/src/compression/native_compression) | [dart]((https://github.com/hanabi1224/flutter_native_extensions/tree/master/src/compression/dart_native_compression)) | flutter
+lz4 compression | [native](https://github.com/hanabi1224/flutter_native_extensions/tree/master/src/compression/native_compression) | [dart](https://github.com/hanabi1224/flutter_native_extensions/tree/master/src/compression/dart_native_compression) | flutter
