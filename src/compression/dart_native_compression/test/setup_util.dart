@@ -5,12 +5,12 @@ final _dylibPrefix = Platform.isWindows ? '' : 'lib';
 final _dylibExtension =
     Platform.isWindows ? '.dll' : (Platform.isMacOS ? '.dylib' : '.so');
 final _dylibName = '${_dylibPrefix}dart_native_compression$_dylibExtension';
-DynamicLibrary _dylib;
+DynamicLibrary? _dylib;
 
 class SetupUtil {
   static Future<DynamicLibrary> getDylibAsync() async {
     await _ensureInitilizedAsync();
-    return _dylib;
+    return _dylib!;
   }
 
   static Future _ensureInitilizedAsync() async {

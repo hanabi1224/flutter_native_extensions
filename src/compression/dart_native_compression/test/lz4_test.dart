@@ -2,7 +2,6 @@ import 'dart:io';
 import 'dart:math';
 import 'dart:typed_data';
 
-import 'package:meta/meta.dart';
 import 'package:collection/collection.dart';
 import 'package:test/test.dart';
 
@@ -11,7 +10,7 @@ import 'package:dart_native_compression/dart_native_compression.dart';
 import 'setup_util.dart';
 
 void main() async {
-  final lz4 = Lz4Lib(lib: await SetupUtil.getDylibAsync());
+  final lz4 = Lz4Lib(await SetupUtil.getDylibAsync());
   test('getVersioinNumber', () {
     final version = lz4.getVersioinNumber();
     print('LZ4 version number: $version');
@@ -68,7 +67,7 @@ void main() async {
 
     var decompressedChunkNumber = 0;
     final decompressedBuilder = BytesBuilder(copy: false);
-    final compressedStream = _splitIntoChunks(compressed, chunkSize: 10);
+    final compressedStream = _splitIntoChunks(compressed, 10);
     await for (final decompressedChunk
         in lz4.decompressFrameStream(compressedStream)) {
       decompressedChunkNumber += 1;
@@ -91,8 +90,7 @@ void main() async {
 
     var decompressedChunkNumber = 0;
     final decompressedBuilder = BytesBuilder(copy: false);
-    final compressedStream =
-        _splitIntoChunks(compressed, chunkSize: 1024 * 1024 * 10);
+    final compressedStream = _splitIntoChunks(compressed, 1024 * 1024 * 10);
     await for (final decompressedChunk
         in lz4.decompressFrameStream(compressedStream)) {
       decompressedChunkNumber += 1;
@@ -106,8 +104,7 @@ void main() async {
   });
 }
 
-Stream<Uint8List> _splitIntoChunks(Uint8List data,
-    {@required int chunkSize}) async* {
+Stream<Uint8List> _splitIntoChunks(Uint8List data, int chunkSize) async* {
   final byteBuffer = data.buffer;
   for (var i = 0; chunkSize * i < byteBuffer.lengthInBytes; i++) {
     final chunk = Uint8List.view(byteBuffer, chunkSize * i,

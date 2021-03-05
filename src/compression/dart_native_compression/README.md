@@ -1,5 +1,5 @@
 # dart_native_compression
-[![Build status](https://img.shields.io/cirrus/github/hanabi1224/flutter_native_extensions/master)](https://cirrus-ci.com/github/hanabi1224/flutter_native_extensions)
+[![Main](https://github.com/hanabi1224/flutter_native_extensions/actions/workflows/main.yml/badge.svg)](https://github.com/hanabi1224/flutter_native_extensions/actions/workflows/main.yml)
 ======
 
 ## LZ4

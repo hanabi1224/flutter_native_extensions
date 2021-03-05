@@ -4,7 +4,6 @@ import 'dart:io';
 import 'dart:math';
 import 'dart:typed_data';
 
-import 'package:meta/meta.dart';
 import 'package:benchmark_harness/benchmark_harness.dart';
 import 'package:dart_native_compression/dart_native_compression.dart';
 
@@ -12,10 +11,9 @@ final _dylibPrefix = Platform.isWindows ? '' : 'lib';
 final _dylibExtension =
     Platform.isWindows ? '.dll' : (Platform.isMacOS ? '.dylib' : '.so');
 final _dylibName = '${_dylibPrefix}dart_native_compression$_dylibExtension';
-DynamicLibrary _dylib;
-Lz4Lib _lz4;
-
-Uint8List _compressed;
+DynamicLibrary? _dylib;
+Lz4Lib? _lz4;
+Uint8List? _compressed;
 
 class AsyncBenchmarkBase {
   final String name;
@@ -88,7 +86,7 @@ class AsyncBenchmarkBase {
 class LZ4DecompressFrameBenchmark extends BenchmarkBase {
   LZ4DecompressFrameBenchmark() : super("decompressFrameOneShot");
   void run() {
-    _lz4.decompressFrame(_compressed);
+    _lz4!.decompressFrame(_compressed!);
   }
 }
 
@@ -96,9 +94,9 @@ class LZ4DecompressFrameStreamBenchmark extends AsyncBenchmarkBase {
   LZ4DecompressFrameStreamBenchmark() : super("decompressFrameStream");
   Future run() async {
     final decompressedBuilder = BytesBuilder(copy: false);
-    final compressedStream = _splitDataIntoChunks(_compressed, chunkSize: 10);
+    final compressedStream = _splitDataIntoChunks(_compressed!, 10);
     await for (final decompressedChunk
-        in _lz4.decompressFrameStream(compressedStream)) {
+        in _lz4!.decompressFrameStream(compressedStream)) {
       decompressedBuilder.add(decompressedChunk);
     }
   }
@@ -109,9 +107,9 @@ class LZ4DecompressFrameStream2Benchmark extends AsyncBenchmarkBase {
   Future run() async {
     final decompressedBuilder = BytesBuilder(copy: false);
     final compressedStream =
-        _splitDataIntoChunks(_compressed, chunkSize: 1024 * 1024 * 10);
+        _splitDataIntoChunks(_compressed!, 1024 * 1024 * 10);
     await for (final decompressedChunk
-        in _lz4.decompressFrameStream(compressedStream)) {
+        in _lz4!.decompressFrameStream(compressedStream)) {
       decompressedBuilder.add(decompressedChunk);
     }
   }
@@ -120,7 +118,7 @@ class LZ4DecompressFrameStream2Benchmark extends AsyncBenchmarkBase {
 void main() async {
   print('Compiling native code...');
   await _compileNative();
-  _lz4 = Lz4Lib(lib: _dylib);
+  _lz4 = Lz4Lib(_dylib!);
   print('Compressing data...');
   await _setupCompressed();
 
@@ -141,11 +139,10 @@ Future _compileNative() async {
 
 Future _setupCompressed() async {
   final src = await File.fromUri(Uri.file('../dickens')).readAsBytesSync();
-  _compressed = _lz4.compressFrame(Uint8List.fromList(src));
+  _compressed = _lz4!.compressFrame(Uint8List.fromList(src));
 }
 
-Stream<Uint8List> _splitDataIntoChunks(Uint8List data,
-    {@required int chunkSize}) async* {
+Stream<Uint8List> _splitDataIntoChunks(Uint8List data, int chunkSize) async* {
   final byteBuffer = data.buffer;
   for (var i = 0; chunkSize * i < byteBuffer.lengthInBytes; i++) {
     final chunk = Uint8List.view(byteBuffer, chunkSize * i,

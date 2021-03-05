@@ -4,14 +4,18 @@ import 'dart:typed_data';
 
 import 'package:collection/collection.dart';
 import 'package:dart_native_compression/utils/uint8_list_utils.dart';
-import 'package:meta/meta.dart';
 import 'package:ffi/ffi.dart';
 
 typedef get_version_number = Function(Void);
 
+/**
+ * Lz4 utility class
+ */
 class Lz4Lib {
-  final DynamicLibrary lib;
-  Lz4Lib({@required this.lib}) {
+  /**
+   * Construct Lz4Lib with DynamicLibrary
+   */
+  Lz4Lib(DynamicLibrary lib) {
     _getVersionNumber = lib
         .lookup<NativeFunction<Int32 Function()>>('ffi_lz4_version_number')
         .asFunction();
@@ -59,25 +63,40 @@ class Lz4Lib {
         .asFunction();
   }
 
-  int Function() _getVersionNumber;
+  late int Function() _getVersionNumber;
+  /**
+   * Get lz4 version number
+   */
   int getVersioinNumber() => _getVersionNumber();
 
-  Pointer<Utf8> Function() _getVersionString;
+  late Pointer<Utf8> Function() _getVersionString;
+  /**
+   * Get lz4 version string
+   */
   String getVersionString() {
     final ptr = _getVersionString();
-    return Utf8.fromUtf8(ptr);
+    return ptr.toDartString();
   }
 
-  int Function() _getFrameVersionNumber;
+  late int Function() _getFrameVersionNumber;
+  /**
+   * Get lz4 frame version number
+   */
   int getFrameVersionNumber() => _getFrameVersionNumber();
 
-  int Function(int) _getCompressFrameBound;
+  late int Function(int) _getCompressFrameBound;
+  /**
+   * Get compression frame bound
+   */
   int getCompressFrameBound(int size) => _getCompressFrameBound(size);
 
-  int Function(Pointer<Uint8>, int, Pointer<Uint8>, int) _compressFrame;
+  late int Function(Pointer<Uint8>, int, Pointer<Uint8>, int) _compressFrame;
+  /**
+   * Compression data into lz4 frame
+   */
   Uint8List compressFrame(Uint8List data) {
     final bound = getCompressFrameBound(data.length);
-    final dstBuffer = allocate<Uint8>(count: bound);
+    final dstBuffer = malloc.allocate<Uint8>(bound);
     final srcBuffer = Uint8ArrayUtils.toPointer(data);
     try {
       final compressedLength =
@@ -85,17 +104,20 @@ class Lz4Lib {
       final list = Uint8ArrayUtils.fromPointer(dstBuffer, compressedLength);
       return Uint8List.fromList(list);
     } finally {
-      free(srcBuffer);
-      free(dstBuffer);
+      malloc.free(srcBuffer);
+      malloc.free(dstBuffer);
     }
   }
 
-  int Function(Pointer) _createDecompressionContext;
-  int Function(Pointer) _freeDecompressionContext;
-  int Function(Pointer<Uint8>, int) _getFrameHeaderSize;
-  int Function(Pointer, Pointer<Uint8>, Pointer<Uint64>, Pointer<Uint8>,
+  late int Function(Pointer) _createDecompressionContext;
+  late int Function(Pointer) _freeDecompressionContext;
+  late int Function(Pointer<Uint8>, int) _getFrameHeaderSize;
+  late int Function(Pointer, Pointer<Uint8>, Pointer<Uint64>, Pointer<Uint8>,
       Pointer<Uint64>) _decompressFrame;
 
+  /**
+   * Decompression data from lz4 frame
+   */
   Uint8List decompressFrame(Uint8List data) {
     if (!ListEquality().equals(_magickHeader, data.sublist(0, 4)) ||
         data.length < 7) {
@@ -106,14 +128,14 @@ class Lz4Lib {
     final estimateDstBufferSize =
         _validateFrameAndGetEstimatedDecodeBufferSize(data, srcBuffer);
 
-    final contextPtr = allocate<Uint64>(count: 1);
+    final contextPtr = malloc.allocate<Uint64>(1);
     _createDecompressionContext(contextPtr);
     final context = Pointer.fromAddress(contextPtr[0]);
 
-    final dstSizePtr = allocate<Uint64>(count: 1);
-    final srcSizePtr = allocate<Uint64>(count: 1);
+    final dstSizePtr = malloc.allocate<Uint64>(1);
+    final srcSizePtr = malloc.allocate<Uint64>(1);
 
-    final dstBuffer = allocate<Uint8>(count: estimateDstBufferSize);
+    final dstBuffer = malloc.allocate<Uint8>(estimateDstBufferSize);
 
     try {
       srcSizePtr.asTypedList(1).setAll(0, [data.length]);
@@ -133,25 +155,28 @@ class Lz4Lib {
       return decompressed.takeBytes();
     } finally {
       _freeDecompressionContext(context);
-      free(contextPtr);
-      free(dstSizePtr);
-      free(srcSizePtr);
-      free(srcBuffer);
-      free(dstBuffer);
+      malloc.free(contextPtr);
+      malloc.free(dstSizePtr);
+      malloc.free(srcSizePtr);
+      malloc.free(srcBuffer);
+      malloc.free(dstBuffer);
     }
   }
 
+  /**
+   * Decompression data from lz4 frame with stream api
+   */
   Stream<Uint8List> decompressFrameStream(Stream<Uint8List> stream) async* {
-    final contextPtr = allocate<Uint64>(count: 1);
+    final contextPtr = malloc.allocate<Uint64>(1);
     _createDecompressionContext(contextPtr);
     final context = Pointer.fromAddress(contextPtr[0]);
 
-    final dstSizePtr = allocate<Uint64>(count: 1);
-    final srcSizePtr = allocate<Uint64>(count: 1);
+    final dstSizePtr = malloc.allocate<Uint64>(1);
+    final srcSizePtr = malloc.allocate<Uint64>(1);
 
     var estimateDstBufferSize = 0;
-    Pointer<Uint8> srcBuffer;
-    Pointer<Uint8> dstBuffer;
+    Pointer<Uint8>? srcBuffer;
+    Pointer<Uint8>? dstBuffer;
 
     int nextSrcSize = 0;
     var sourceBufferBuilder = BytesBuilder();
@@ -163,7 +188,7 @@ class Lz4Lib {
           srcBuffer = Uint8ArrayUtils.toPointer(chunk);
           estimateDstBufferSize =
               _validateFrameAndGetEstimatedDecodeBufferSize(chunk, srcBuffer);
-          dstBuffer = allocate<Uint8>(count: estimateDstBufferSize);
+          dstBuffer = malloc.allocate<Uint8>(estimateDstBufferSize);
         } else if (nextSrcSize == 0) {
           return;
         } else if (nextSrcSize < 0) {
@@ -173,7 +198,7 @@ class Lz4Lib {
         sourceBufferBuilder.add(chunk);
         while (sourceBufferBuilder.length >= nextSrcSize) {
           if (srcBuffer != null) {
-            free(srcBuffer);
+            malloc.free(srcBuffer);
           }
           if (nextSrcSize == 0) {
             srcBuffer =
@@ -187,7 +212,7 @@ class Lz4Lib {
           }
           dstSizePtr.asTypedList(1).setAll(0, [estimateDstBufferSize]);
           nextSrcSize = _decompressFrame(
-              context, dstBuffer, dstSizePtr, srcBuffer, srcSizePtr);
+              context, dstBuffer!, dstSizePtr, srcBuffer, srcSizePtr);
           final consumedSrcSize = srcSizePtr[0];
           if (consumedSrcSize >= sourceBufferBuilder.length) {
             sourceBufferBuilder.clear();
@@ -210,14 +235,14 @@ class Lz4Lib {
       }
     } finally {
       _freeDecompressionContext(context);
-      free(contextPtr);
-      free(dstSizePtr);
-      free(srcSizePtr);
+      malloc.free(contextPtr);
+      malloc.free(dstSizePtr);
+      malloc.free(srcSizePtr);
       if (srcBuffer != null) {
-        free(srcBuffer);
+        malloc.free(srcBuffer);
       }
       if (dstBuffer != null) {
-        free(dstBuffer);
+        malloc.free(dstBuffer);
       }
     }
   }
@@ -257,14 +282,14 @@ class Lz4Lib {
 
     final blockMaxSizeKey = chunk[5] >> 4 & 0x07;
     if (_blockSizeTable.containsKey(blockMaxSizeKey)) {
-      final blockMaxSize = _blockSizeTable[blockMaxSizeKey];
+      final blockMaxSize = _blockSizeTable[blockMaxSizeKey]!;
       if (estimateDstBufferSize == 0 || estimateDstBufferSize > blockMaxSize) {
         estimateDstBufferSize = blockMaxSize;
       }
     }
 
     if (estimateDstBufferSize == 0) {
-      estimateDstBufferSize = _blockSizeTable[7];
+      estimateDstBufferSize = _blockSizeTable[7]!;
     }
 
     return estimateDstBufferSize;
