@@ -12,7 +12,7 @@ import 'setup_util.dart';
 void main() async {
   final lz4 = Lz4Lib(await SetupUtil.getDylibAsync());
   test('getVersioinNumber', () {
-    final version = lz4.getVersioinNumber();
+    final version = lz4.getVersionNumber();
     print('LZ4 version number: $version');
     assert(version == 10903);
   });
@@ -49,7 +49,7 @@ void main() async {
     // http://sun.aei.polsl.pl/~sdeor/index.php?page=silesia
     final src = await File.fromUri(Uri.file('dickens')).readAsBytesSync();
     print('src: ${src.length}');
-    final compressed = lz4.compressFrame(Uint8List.fromList(src));
+    final compressed = lz4.compressFrame(src);
     print('compressed: ${compressed.length}');
     assert(compressed.length > 0);
     final decompressed = lz4.decompressFrame(compressed);
@@ -61,13 +61,13 @@ void main() async {
     // http://sun.aei.polsl.pl/~sdeor/index.php?page=silesia
     final src = await File.fromUri(Uri.file('dickens')).readAsBytesSync();
     print('src: ${src.length}');
-    final compressed = lz4.compressFrame(Uint8List.fromList(src));
+    final compressed = lz4.compressFrame(src);
     print('compressed: ${compressed.length}');
     assert(compressed.length > 0);
 
     var decompressedChunkNumber = 0;
     final decompressedBuilder = BytesBuilder(copy: false);
-    final compressedStream = _splitIntoChunks(compressed, 10);
+    final compressedStream = _splitIntoChunks(compressed, 11);
     await for (final decompressedChunk
         in lz4.decompressFrameStream(compressedStream)) {
       decompressedChunkNumber += 1;
@@ -84,13 +84,13 @@ void main() async {
     // http://sun.aei.polsl.pl/~sdeor/index.php?page=silesia
     final src = await File.fromUri(Uri.file('dickens')).readAsBytesSync();
     print('src: ${src.length}');
-    final compressed = lz4.compressFrame(Uint8List.fromList(src));
+    final compressed = lz4.compressFrame(src);
     print('compressed: ${compressed.length}');
     assert(compressed.length > 0);
 
     var decompressedChunkNumber = 0;
     final decompressedBuilder = BytesBuilder(copy: false);
-    final compressedStream = _splitIntoChunks(compressed, 1024 * 1024 * 10);
+    final compressedStream = _splitIntoChunks(compressed, 1024 * 1024 * 11);
     await for (final decompressedChunk
         in lz4.decompressFrameStream(compressedStream)) {
       decompressedChunkNumber += 1;
@@ -110,7 +110,7 @@ Stream<Uint8List> _splitIntoChunks(Uint8List data, int chunkSize) async* {
     final chunk = Uint8List.view(byteBuffer, chunkSize * i,
         min(byteBuffer.lengthInBytes - (chunkSize * i), chunkSize));
     if (chunk.length > 0) {
-      yield Uint8List.fromList(chunk);
+      yield chunk;
     } else {
       break;
     }

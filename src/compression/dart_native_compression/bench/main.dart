@@ -91,10 +91,11 @@ class LZ4DecompressFrameBenchmark extends BenchmarkBase {
 }
 
 class LZ4DecompressFrameStreamBenchmark extends AsyncBenchmarkBase {
-  LZ4DecompressFrameStreamBenchmark() : super("decompressFrameStream");
+  LZ4DecompressFrameStreamBenchmark()
+      : super("decompressFrameStreamWithSmallChunk");
   Future run() async {
-    final decompressedBuilder = BytesBuilder(copy: false);
-    final compressedStream = _splitDataIntoChunks(_compressed!, 10);
+    final decompressedBuilder = BytesBuilder(copy: true);
+    final compressedStream = _splitDataIntoChunks(_compressed!, 11);
     await for (final decompressedChunk
         in _lz4!.decompressFrameStream(compressedStream)) {
       decompressedBuilder.add(decompressedChunk);
@@ -103,11 +104,12 @@ class LZ4DecompressFrameStreamBenchmark extends AsyncBenchmarkBase {
 }
 
 class LZ4DecompressFrameStream2Benchmark extends AsyncBenchmarkBase {
-  LZ4DecompressFrameStream2Benchmark() : super("decompressFrameStream2");
+  LZ4DecompressFrameStream2Benchmark()
+      : super("decompressFrameStreamWithLargeChunk");
   Future run() async {
-    final decompressedBuilder = BytesBuilder(copy: false);
+    final decompressedBuilder = BytesBuilder(copy: true);
     final compressedStream =
-        _splitDataIntoChunks(_compressed!, 1024 * 1024 * 10);
+        _splitDataIntoChunks(_compressed!, 1024 * 1024 * 11);
     await for (final decompressedChunk
         in _lz4!.decompressFrameStream(compressedStream)) {
       decompressedBuilder.add(decompressedChunk);
@@ -139,7 +141,7 @@ Future _compileNative() async {
 
 Future _setupCompressed() async {
   final src = await File.fromUri(Uri.file('../dickens')).readAsBytesSync();
-  _compressed = _lz4!.compressFrame(Uint8List.fromList(src));
+  _compressed = _lz4!.compressFrame(src);
 }
 
 Stream<Uint8List> _splitDataIntoChunks(Uint8List data, int chunkSize) async* {
@@ -148,7 +150,7 @@ Stream<Uint8List> _splitDataIntoChunks(Uint8List data, int chunkSize) async* {
     final chunk = Uint8List.view(byteBuffer, chunkSize * i,
         min(byteBuffer.lengthInBytes - (chunkSize * i), chunkSize));
     if (chunk.length > 0) {
-      yield Uint8List.fromList(chunk);
+      yield chunk;
     } else {
       break;
     }
