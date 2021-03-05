@@ -137,8 +137,7 @@ class Lz4Lib {
         final srcSize = srcSizePtr.value;
         srcPtrOffset += srcSize;
         final dstSize = dstSizePtr.value;
-        final dstBufferView = dstBuffer.asTypedList(dstSize);
-        decompressed.add(dstBufferView);
+        decompressed.add(dstBuffer.asTypedList(dstSize));
       } while (nextSrcSize > 0);
       return decompressed.takeBytes();
     } finally {
@@ -169,17 +168,15 @@ class Lz4Lib {
     List<NativeBytesBuilder> danglePointers = [];
     try {
       var remainder = BytesBuilder(copy: true);
-      var chunkId = -1;
       await for (final chunk in stream) {
-        chunkId += 1;
-        if (chunkId == 0) {
+        if (sourceBufferBuilder == null) {
           sourceBufferBuilder = NativeBytesBuilder(chunk.length);
           sourceBufferBuilder.add(chunk);
           estimateDstBufferSize = _validateFrameAndGetEstimatedDecodeBufferSize(
               chunk, sourceBufferBuilder.ptr);
           dstBuffer = malloc.allocate<Uint8>(estimateDstBufferSize);
         } else {
-          var r = sourceBufferBuilder!.add(chunk);
+          var r = sourceBufferBuilder.add(chunk);
           if (r.length > 0) {
             remainder.add(r);
           }
@@ -191,9 +188,8 @@ class Lz4Lib {
           nextSrcSize = _decompressFrame(context, dstBuffer!, dstSizePtr,
               sourceBufferBuilder.ptr, srcSizePtr);
           final dstSize = dstSizePtr.value;
-          final dstBufferView = dstBuffer.asTypedList(dstSize);
           final decompressedChunkBuilder = BytesBuilder(copy: true);
-          decompressedChunkBuilder.add(dstBufferView);
+          decompressedChunkBuilder.add(dstBuffer.asTypedList(dstSize));
           yield decompressedChunkBuilder.takeBytes();
           if (nextSrcSize > 0) {
             final consumedSrcSize = srcSizePtr.value;
@@ -204,8 +200,8 @@ class Lz4Lib {
                 sourceBufferBuilder =
                     sourceBufferBuilder.shift(consumedSrcSize);
               } else {
-                final view = sourceBufferBuilder.asTypedList();
-                remainder.add(view.sublist(consumedSrcSize));
+                remainder.add(
+                    sourceBufferBuilder.asTypedList().sublist(consumedSrcSize));
                 sourceBufferBuilder.free();
                 sourceBufferBuilder = NativeBytesBuilder(nextSrcSize);
               }

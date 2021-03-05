@@ -17,16 +17,13 @@ class NativeBytesBuilder {
   int _pos = 0;
   late int _capacity;
   late Pointer<Uint8> ptr;
-  late Uint8List _view;
   bool _needFree = true;
   NativeBytesBuilder(this._capacity) {
     ptr = malloc.allocate(_capacity);
-    _view = ptr.asTypedList(_capacity);
   }
 
   NativeBytesBuilder._fromPointer(
       Pointer<Uint8> this.ptr, this._capacity, this._pos) {
-    _view = ptr.asTypedList(_capacity);
     _needFree = false;
   }
 
@@ -47,8 +44,10 @@ class NativeBytesBuilder {
       } else {
         bytesToSet = bytes;
       }
-      _view.setAll(_pos, bytesToSet);
-      _pos += bytesToSet.length;
+
+      for (var i = 0; i < bytesToSet.length; i++) {
+        ptr[_pos++] = bytesToSet[i];
+      }
     }
     return remainder;
   }
