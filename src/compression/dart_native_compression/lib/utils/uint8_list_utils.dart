@@ -3,13 +3,13 @@ import 'dart:math';
 import 'dart:typed_data';
 import 'package:ffi/ffi.dart';
 
-class Uint8ArrayUtils {
+extension Uint8ListPointer on Uint8List {
   // https://github.com/dart-lang/ffi/issues/31
   // Workaround: before does not allow direct pointer exposure
-  static Pointer<Uint8> toPointer(Uint8List bytes) {
-    final ptr = malloc.allocate<Uint8>(bytes.length);
-    final byteList = ptr.asTypedList(bytes.length);
-    byteList.setAll(0, bytes);
+  Pointer<Uint8> getPointer() {
+    final ptr = malloc.allocate<Uint8>(length);
+    final byteList = ptr.asTypedList(length);
+    byteList.setAll(0, this);
     return ptr.cast();
   }
 }

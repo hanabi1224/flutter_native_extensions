@@ -89,7 +89,7 @@ class Lz4Lib {
   /// Compression data into lz4 frame
   Uint8List compressFrame(Uint8List data) {
     final bound = getCompressFrameBound(data.length);
-    final srcBuffer = Uint8ArrayUtils.toPointer(data);
+    final srcBuffer = data.getPointer();
     try {
       final dstBuffer = malloc.allocate<Uint8>(bound);
       final compressedLength =
@@ -112,7 +112,7 @@ class Lz4Lib {
       throw Exception('Invalid data');
     }
 
-    final srcBuffer = Uint8ArrayUtils.toPointer(data);
+    final srcBuffer = data.getPointer();
     final estimateDstBufferSize =
         _validateFrameAndGetEstimatedDecodeBufferSize(data, srcBuffer);
 

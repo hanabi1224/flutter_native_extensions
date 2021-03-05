@@ -1,4 +1,4 @@
-#### Getting Started
+## Getting Started
 
 ```dart
 import 'dart:ffi';
@@ -29,5 +29,5 @@ await for (final decompressedChunk
 }
 ```
 
-#### To get more examples
+## To get more examples
 Go to [unit test](https://github.com/hanabi1224/flutter_native_extensions/blob/master/src/compression/dart_native_compression/test/lz4_test.dart)

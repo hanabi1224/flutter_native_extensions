@@ -54,9 +54,9 @@ curl --proto '=https' --tlsv1.2 -sSf https://sh.rustup.rs | sh
 ```
 go to [native_compression](https://github.com/hanabi1224/flutter_native_extensions/tree/master/src/compression/native_compression) directory, run
 ```bash
-cargo build --release
+cargo build --release --all-features
 ```
-for different target
+to cross compile to different target
 ```bash
 cargo lipo --release --targets=aarch64-apple-ios,x86_64-apple-ios,armv7-apple-ios,armv7s-apple-ios
 cargo build --target aarch64-linux-android --release
