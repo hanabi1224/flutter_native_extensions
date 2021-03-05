@@ -177,7 +177,7 @@ class Lz4Lib {
           dstBuffer = malloc.allocate<Uint8>(estimateDstBufferSize);
         } else {
           var r = sourceBufferBuilder.add(chunk);
-          if (r.length > 0) {
+          if (r != null && r.length > 0) {
             remainder.add(r);
           }
         }
@@ -188,9 +188,11 @@ class Lz4Lib {
           nextSrcSize = _decompressFrame(context, dstBuffer!, dstSizePtr,
               sourceBufferBuilder.ptr, srcSizePtr);
           final dstSize = dstSizePtr.value;
-          final decompressedChunkBuilder = BytesBuilder(copy: true);
-          decompressedChunkBuilder.add(dstBuffer.asTypedList(dstSize));
-          yield decompressedChunkBuilder.takeBytes();
+          if (dstSize > 0) {
+            final decompressedChunkBuilder = BytesBuilder(copy: true);
+            decompressedChunkBuilder.add(dstBuffer.asTypedList(dstSize));
+            yield decompressedChunkBuilder.takeBytes();
+          }
           if (nextSrcSize > 0) {
             final consumedSrcSize = srcSizePtr.value;
             if (consumedSrcSize < sourceBufferBuilder.length) {
@@ -212,7 +214,7 @@ class Lz4Lib {
             if (remainder.length > 0) {
               final r = sourceBufferBuilder.add(remainder.takeBytes());
               remainder.clear();
-              if (r.length > 0) {
+              if (r != null && r.length > 0) {
                 remainder.add(r);
               }
             }

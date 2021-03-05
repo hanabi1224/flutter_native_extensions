@@ -42,10 +42,10 @@ void main() async {
 }
 
 void _testNativeBytesBuilder(int listSize, int bufferSize) {
-  var remainder = List.filled(listSize, 0);
+  List<int>? remainder = List.filled(listSize, 0);
   var buffer = NativeBytesBuilder(bufferSize);
   var count = 0;
-  while (remainder.length > 0) {
+  while (remainder != null && remainder.length > 0) {
     remainder = buffer.add(remainder);
     buffer.free();
     buffer = NativeBytesBuilder(bufferSize);

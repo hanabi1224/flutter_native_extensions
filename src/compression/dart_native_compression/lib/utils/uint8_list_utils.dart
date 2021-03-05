@@ -1,4 +1,5 @@
 import 'dart:ffi';
+import 'dart:math';
 import 'dart:typed_data';
 import 'package:ffi/ffi.dart';
 
@@ -30,23 +31,18 @@ class NativeBytesBuilder {
   get capacity => _capacity;
   get length => _pos;
 
-  List<int> add(List<int> bytes) {
+  List<int>? add(List<int> bytes) {
     if (_pos >= _capacity) {
       return bytes;
     }
-    List<int> remainder = [];
+    List<int>? remainder;
     if (bytes.length > 0) {
       var maxAllowed = _capacity - _pos;
-      late List<int> bytesToSet;
       if (maxAllowed < bytes.length) {
-        bytesToSet = bytes.sublist(0, maxAllowed);
         remainder = bytes.sublist(maxAllowed);
-      } else {
-        bytesToSet = bytes;
       }
-
-      for (var i = 0; i < bytesToSet.length; i++) {
-        ptr[_pos++] = bytesToSet[i];
+      for (var i = 0; i < min(maxAllowed, bytes.length); i++) {
+        ptr[_pos++] = bytes[i];
       }
     }
     return remainder;
