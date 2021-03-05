@@ -35,6 +35,5 @@ jobs:
           popd
           pushd src/compression/dart_native_compression/bench
           pub get
-          dart main.dart
+          dart run main.dart
           popd
-

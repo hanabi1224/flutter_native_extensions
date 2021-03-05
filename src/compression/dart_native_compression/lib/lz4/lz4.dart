@@ -8,13 +8,9 @@ import 'package:ffi/ffi.dart';
 
 typedef get_version_number = Function(Void);
 
-/**
- * Lz4 utility class
- */
+/// Lz4 utility class
 class Lz4Lib {
-  /**
-   * Construct Lz4Lib with DynamicLibrary
-   */
+  /// Construct Lz4Lib with DynamicLibrary
   Lz4Lib(DynamicLibrary lib) {
     _getVersionNumber = lib
         .lookup<NativeFunction<Int32 Function()>>('ffi_lz4_version_number')
@@ -64,48 +60,41 @@ class Lz4Lib {
   }
 
   late int Function() _getVersionNumber;
-  /**
-   * Get lz4 version number
-   */
+
+  /// Get lz4 version number
   int getVersioinNumber() => _getVersionNumber();
 
   late Pointer<Utf8> Function() _getVersionString;
-  /**
-   * Get lz4 version string
-   */
+
+  /// Get lz4 version string
   String getVersionString() {
     final ptr = _getVersionString();
     return ptr.toDartString();
   }
 
   late int Function() _getFrameVersionNumber;
-  /**
-   * Get lz4 frame version number
-   */
+
+  /// Get lz4 frame version number
   int getFrameVersionNumber() => _getFrameVersionNumber();
 
   late int Function(int) _getCompressFrameBound;
-  /**
-   * Get compression frame bound
-   */
+
+  /// Get compression frame bound
   int getCompressFrameBound(int size) => _getCompressFrameBound(size);
 
   late int Function(Pointer<Uint8>, int, Pointer<Uint8>, int) _compressFrame;
-  /**
-   * Compression data into lz4 frame
-   */
+
+  /// Compression data into lz4 frame
   Uint8List compressFrame(Uint8List data) {
     final bound = getCompressFrameBound(data.length);
-    final dstBuffer = malloc.allocate<Uint8>(bound);
     final srcBuffer = Uint8ArrayUtils.toPointer(data);
     try {
+      final dstBuffer = malloc.allocate<Uint8>(bound);
       final compressedLength =
           _compressFrame(dstBuffer, bound, srcBuffer, data.length);
-      final list = Uint8ArrayUtils.fromPointer(dstBuffer, compressedLength);
-      return Uint8List.fromList(list);
+      return dstBuffer.asTypedList(compressedLength);
     } finally {
       malloc.free(srcBuffer);
-      malloc.free(dstBuffer);
     }
   }
 
@@ -115,9 +104,7 @@ class Lz4Lib {
   late int Function(Pointer, Pointer<Uint8>, Pointer<Uint64>, Pointer<Uint8>,
       Pointer<Uint64>) _decompressFrame;
 
-  /**
-   * Decompression data from lz4 frame
-   */
+  /// Decompression data from lz4 frame
   Uint8List decompressFrame(Uint8List data) {
     if (!ListEquality().equals(_magickHeader, data.sublist(0, 4)) ||
         data.length < 7) {
@@ -163,9 +150,8 @@ class Lz4Lib {
     }
   }
 
-  /**
-   * Decompression data from lz4 frame with stream api
-   */
+  /// Decompression data from lz4 frame with stream api
+  /// https://github.com/lz4/lz4/blob/dev/doc/lz4_Frame_format.md
   Stream<Uint8List> decompressFrameStream(Stream<Uint8List> stream) async* {
     final contextPtr = malloc.allocate<Uint64>(1);
     _createDecompressionContext(contextPtr);
@@ -261,7 +247,6 @@ class Lz4Lib {
       throw Exception('First chunk too small');
     }
 
-    // https://github.com/lz4/lz4/blob/v1.9.2/doc/lz4_Frame_format.md
     var estimateDstBufferSize = 0;
     final flagByte = chunk[4];
     final hasContentSize = flagByte & 0x08 > 0;

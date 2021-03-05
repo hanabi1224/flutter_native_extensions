@@ -1,3 +1,6 @@
 [submodule "src/compression/native_compression/liblz4"]
 	path = src/compression/native_compression/liblz4
 	url = https://github.com/lz4/lz4.git
+[submodule "src/annoy/RuAnnoy"]
+	path = src/annoy/RuAnnoy
+	url = https://github.com/hanabi1224/RuAnnoy
