@@ -168,7 +168,7 @@ class Lz4Lib {
     NativeBytesBuilder? sourceBufferBuilder;
     List<NativeBytesBuilder> danglePointers = [];
     try {
-      var remainder = BytesBuilder(copy: false);
+      var remainder = BytesBuilder(copy: true);
       var chunkId = -1;
       await for (final chunk in stream) {
         chunkId += 1;

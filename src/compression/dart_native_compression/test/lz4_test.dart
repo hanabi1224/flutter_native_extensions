@@ -67,7 +67,7 @@ void main() async {
 
     var decompressedChunkNumber = 0;
     final decompressedBuilder = BytesBuilder(copy: false);
-    final compressedStream = _splitIntoChunks(compressed, 10);
+    final compressedStream = _splitIntoChunks(compressed, 11);
     await for (final decompressedChunk
         in lz4.decompressFrameStream(compressedStream)) {
       decompressedChunkNumber += 1;
@@ -90,7 +90,7 @@ void main() async {
 
     var decompressedChunkNumber = 0;
     final decompressedBuilder = BytesBuilder(copy: false);
-    final compressedStream = _splitIntoChunks(compressed, 1024 * 1024 * 10);
+    final compressedStream = _splitIntoChunks(compressed, 1024 * 1024 * 11);
     await for (final decompressedChunk
         in lz4.decompressFrameStream(compressedStream)) {
       decompressedChunkNumber += 1;
