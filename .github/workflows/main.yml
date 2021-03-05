@@ -38,3 +38,14 @@ jobs:
           pub get
           dart run main.dart
           popd
+      - name: Annoy
+        run: |
+          pushd src/annoy/RuAnnoy
+          cargo build --release --all-features
+          cargo test --release --all-features -- --nocapture
+          popd
+          pushd src/annoy/dart_native_annoy
+          pub get
+          dart run test
+          dart analyze lib
+          popd
