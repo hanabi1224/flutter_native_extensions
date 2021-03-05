@@ -6,65 +6,71 @@ import 'package:collection/collection.dart';
 import 'package:dart_native_compression/utils/uint8_list_utils.dart';
 import 'package:ffi/ffi.dart';
 
-typedef get_version_number = Function(Void);
+typedef GetVersionNumberNative = Int32 Function();
+typedef GetVersionNumber = int Function();
+
+typedef GetVersionStringNative = Pointer<Utf8> Function();
+typedef GetVersionString = Pointer<Utf8> Function();
+
+typedef GetFrameVersionNumberNative = Uint64 Function();
+typedef GetFrameVersionNumber = int Function();
+
+typedef GetCompressFrameBoundNative = Uint64 Function(Uint64);
+typedef GetCompressFrameBound = int Function(int);
+
+typedef CompressFrameNative = Uint64 Function(
+    Pointer<Uint8>, Uint64, Pointer<Uint8>, Uint64);
+typedef CompressFrame = int Function(Pointer<Uint8>, int, Pointer<Uint8>, int);
+
+typedef DecompressFrameNative = Uint64 Function(
+    Pointer, Pointer<Uint8>, Pointer<Uint64>, Pointer<Uint8>, Pointer<Uint64>);
+typedef DecompressFrame = int Function(
+    Pointer, Pointer<Uint8>, Pointer<Uint64>, Pointer<Uint8>, Pointer<Uint64>);
 
 /// Lz4 utility class
 class Lz4Lib {
   /// Construct Lz4Lib with DynamicLibrary
   Lz4Lib(DynamicLibrary lib) {
-    _getVersionNumber = lib
-        .lookup<NativeFunction<Int32 Function()>>('ffi_lz4_version_number')
-        .asFunction();
+    getVersionNumber =
+        lib.lookupFunction<GetVersionNumberNative, GetVersionNumber>(
+            'ffi_lz4_version_number');
 
-    _getVersionString = lib
-        .lookup<NativeFunction<Pointer<Utf8> Function()>>(
-            'ffi_lz4_version_string')
-        .asFunction();
-    _getFrameVersionNumber = lib
-        .lookup<NativeFunction<Uint64 Function()>>('ffi_lz4f_get_version')
-        .asFunction();
+    _getVersionString =
+        lib.lookupFunction<GetVersionStringNative, GetVersionString>(
+            'ffi_lz4_version_string');
 
-    _getCompressFrameBound = lib
-        .lookup<NativeFunction<Uint64 Function(Uint64)>>(
-            'ffi_lz4f_compress_frame_bound')
-        .asFunction();
+    getFrameVersionNumber =
+        lib.lookupFunction<GetFrameVersionNumberNative, GetFrameVersionNumber>(
+            'ffi_lz4f_get_version');
 
-    _compressFrame = lib
-        .lookup<
-            NativeFunction<
-                Uint64 Function(Pointer<Uint8>, Uint64, Pointer<Uint8>,
-                    Uint64)>>('ffi_lz4f_compress_frame')
-        .asFunction();
+    getCompressFrameBound =
+        lib.lookupFunction<GetCompressFrameBoundNative, GetCompressFrameBound>(
+            'ffi_lz4f_compress_frame_bound');
 
-    _createDecompressionContext = lib
-        .lookup<NativeFunction<Uint64 Function(Pointer)>>(
-            'ffi_lz4f_create_decompression_context')
-        .asFunction();
+    _compressFrame = lib.lookupFunction<CompressFrameNative, CompressFrame>(
+        'ffi_lz4f_compress_frame');
 
-    _freeDecompressionContext = lib
-        .lookup<NativeFunction<Uint64 Function(Pointer)>>(
-            'ffi_lz4f_free_decompression_context')
-        .asFunction();
+    _createDecompressionContext =
+        lib.lookupFunction<Uint64 Function(Pointer), int Function(Pointer)>(
+            'ffi_lz4f_create_decompression_context');
 
-    _getFrameHeaderSize = lib
-        .lookup<NativeFunction<Uint64 Function(Pointer<Uint8>, Uint64)>>(
-            'ffi_lz4f_header_size')
-        .asFunction();
+    _freeDecompressionContext =
+        lib.lookupFunction<Uint64 Function(Pointer), int Function(Pointer)>(
+            'ffi_lz4f_free_decompression_context');
 
-    _decompressFrame = lib
-        .lookup<
-            NativeFunction<
-                Uint64 Function(Pointer, Pointer<Uint8>, Pointer<Uint64>,
-                    Pointer<Uint8>, Pointer<Uint64>)>>('ffi_lz4f_decompress')
-        .asFunction();
+    _getFrameHeaderSize = lib.lookupFunction<
+        Uint64 Function(Pointer<Uint8>, Uint64),
+        int Function(Pointer<Uint8>, int)>('ffi_lz4f_header_size');
+
+    _decompressFrame =
+        lib.lookupFunction<DecompressFrameNative, DecompressFrame>(
+            'ffi_lz4f_decompress');
   }
 
-  late int Function() _getVersionNumber;
-
   /// Get lz4 version number
-  int getVersioinNumber() => _getVersionNumber();
+  late GetVersionNumber getVersionNumber;
 
-  late Pointer<Utf8> Function() _getVersionString;
+  late GetVersionString _getVersionString;
 
   /// Get lz4 version string
   String getVersionString() {
@@ -72,17 +78,13 @@ class Lz4Lib {
     return ptr.toDartString();
   }
 
-  late int Function() _getFrameVersionNumber;
-
   /// Get lz4 frame version number
-  int getFrameVersionNumber() => _getFrameVersionNumber();
-
-  late int Function(int) _getCompressFrameBound;
+  late GetFrameVersionNumber getFrameVersionNumber;
 
   /// Get compression frame bound
-  int getCompressFrameBound(int size) => _getCompressFrameBound(size);
+  late GetCompressFrameBound getCompressFrameBound;
 
-  late int Function(Pointer<Uint8>, int, Pointer<Uint8>, int) _compressFrame;
+  late CompressFrame _compressFrame;
 
   /// Compression data into lz4 frame
   Uint8List compressFrame(Uint8List data) {
@@ -101,8 +103,7 @@ class Lz4Lib {
   late int Function(Pointer) _createDecompressionContext;
   late int Function(Pointer) _freeDecompressionContext;
   late int Function(Pointer<Uint8>, int) _getFrameHeaderSize;
-  late int Function(Pointer, Pointer<Uint8>, Pointer<Uint64>, Pointer<Uint8>,
-      Pointer<Uint64>) _decompressFrame;
+  late DecompressFrame _decompressFrame;
 
   /// Decompression data from lz4 frame
   Uint8List decompressFrame(Uint8List data) {
@@ -165,6 +166,7 @@ class Lz4Lib {
     Pointer<Uint8>? dstBuffer;
     int nextSrcSize = 0;
     NativeBytesBuilder? sourceBufferBuilder;
+    List<NativeBytesBuilder> danglePointers = [];
     try {
       var remainder = BytesBuilder(copy: false);
       var chunkId = -1;
@@ -196,11 +198,21 @@ class Lz4Lib {
           if (nextSrcSize > 0) {
             final consumedSrcSize = srcSizePtr[0];
             if (consumedSrcSize < sourceBufferBuilder.length) {
-              final view = sourceBufferBuilder.asTypedList();
-              remainder.add(view.sublist(consumedSrcSize));
+              if (consumedSrcSize + nextSrcSize <
+                  sourceBufferBuilder.capacity) {
+                danglePointers.add(sourceBufferBuilder);
+                sourceBufferBuilder =
+                    sourceBufferBuilder.shift(consumedSrcSize);
+              } else {
+                final view = sourceBufferBuilder.asTypedList();
+                remainder.add(view.sublist(consumedSrcSize));
+                sourceBufferBuilder.free();
+                sourceBufferBuilder = NativeBytesBuilder(nextSrcSize);
+              }
+            } else {
+              sourceBufferBuilder.free();
+              sourceBufferBuilder = NativeBytesBuilder(nextSrcSize);
             }
-            sourceBufferBuilder.free();
-            sourceBufferBuilder = NativeBytesBuilder(nextSrcSize);
             if (remainder.length > 0) {
               final r = sourceBufferBuilder.add(remainder.takeBytes());
               remainder.clear();
@@ -223,6 +235,9 @@ class Lz4Lib {
       }
       if (sourceBufferBuilder != null) {
         sourceBufferBuilder.free();
+      }
+      for (final p in danglePointers) {
+        p.free();
       }
     }
   }

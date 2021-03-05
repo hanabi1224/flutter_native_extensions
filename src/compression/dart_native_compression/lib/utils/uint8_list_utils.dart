@@ -18,9 +18,16 @@ class NativeBytesBuilder {
   late int _capacity;
   late Pointer<Uint8> ptr;
   late Uint8List _view;
+  bool _needFree = true;
   NativeBytesBuilder(this._capacity) {
     ptr = malloc.allocate(_capacity);
     _view = ptr.asTypedList(_capacity);
+  }
+
+  NativeBytesBuilder._fromPointer(
+      Pointer<Uint8> this.ptr, this._capacity, this._pos) {
+    _view = ptr.asTypedList(_capacity);
+    _needFree = false;
   }
 
   get capacity => _capacity;
@@ -50,7 +57,14 @@ class NativeBytesBuilder {
     return ptr.asTypedList(length);
   }
 
+  NativeBytesBuilder shift(int offset) {
+    return NativeBytesBuilder._fromPointer(
+        ptr.elementAt(offset), _capacity - offset, _pos - offset);
+  }
+
   void free() {
-    malloc.free(ptr);
+    if (_needFree) {
+      malloc.free(ptr);
+    }
   }
 }

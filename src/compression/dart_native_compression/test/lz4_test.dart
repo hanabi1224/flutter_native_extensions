@@ -12,7 +12,7 @@ import 'setup_util.dart';
 void main() async {
   final lz4 = Lz4Lib(await SetupUtil.getDylibAsync());
   test('getVersioinNumber', () {
-    final version = lz4.getVersioinNumber();
+    final version = lz4.getVersionNumber();
     print('LZ4 version number: $version');
     assert(version == 10903);
   });
