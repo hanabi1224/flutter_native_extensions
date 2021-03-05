@@ -126,17 +126,17 @@ class Lz4Lib {
     final dstBuffer = malloc.allocate<Uint8>(estimateDstBufferSize);
 
     try {
-      srcSizePtr[0] = data.length;
+      srcSizePtr.value = data.length;
       int srcPtrOffset = 0;
       int nextSrcSize = 0;
       final decompressed = BytesBuilder(copy: true);
       do {
-        dstSizePtr[0] = estimateDstBufferSize;
+        dstSizePtr.value = estimateDstBufferSize;
         nextSrcSize = _decompressFrame(context, dstBuffer, dstSizePtr,
             srcBuffer.elementAt(srcPtrOffset), srcSizePtr);
-        final srcSize = srcSizePtr[0];
+        final srcSize = srcSizePtr.value;
         srcPtrOffset += srcSize;
-        final dstSize = dstSizePtr[0];
+        final dstSize = dstSizePtr.value;
         final dstBufferView = dstBuffer.asTypedList(dstSize);
         decompressed.add(dstBufferView);
       } while (nextSrcSize > 0);
@@ -186,17 +186,17 @@ class Lz4Lib {
         }
 
         while (sourceBufferBuilder!.length >= nextSrcSize) {
-          srcSizePtr[0] = sourceBufferBuilder.length;
-          dstSizePtr[0] = estimateDstBufferSize;
+          srcSizePtr.value = sourceBufferBuilder.length;
+          dstSizePtr.value = estimateDstBufferSize;
           nextSrcSize = _decompressFrame(context, dstBuffer!, dstSizePtr,
               sourceBufferBuilder.ptr, srcSizePtr);
-          final dstSize = dstSizePtr[0];
+          final dstSize = dstSizePtr.value;
           final dstBufferView = dstBuffer.asTypedList(dstSize);
           final decompressedChunkBuilder = BytesBuilder(copy: true);
           decompressedChunkBuilder.add(dstBufferView);
           yield decompressedChunkBuilder.takeBytes();
           if (nextSrcSize > 0) {
-            final consumedSrcSize = srcSizePtr[0];
+            final consumedSrcSize = srcSizePtr.value;
             if (consumedSrcSize < sourceBufferBuilder.length) {
               if (consumedSrcSize + nextSrcSize <
                   sourceBufferBuilder.capacity) {
