@@ -33,7 +33,7 @@ Go to [unit test](https://github.com/hanabi1224/flutter_native_extensions/blob/m
 pub get && dart run test
 ```
 
-## To build native lib (libnative_compression.so)
+## To build native lib (libru_annoy.so)
 
 install rust
 ```bash

@@ -14,5 +14,3 @@ dependencies:
 dev_dependencies:
   test: any
   pedantic: any
-
-include: package:pedantic/analysis_options.yaml

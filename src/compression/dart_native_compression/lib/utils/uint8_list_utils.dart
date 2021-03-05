@@ -16,28 +16,26 @@ extension Uint8ListPointer on Uint8List {
 
 class NativeBytesBuilder {
   int _pos = 0;
-  late int _capacity;
+  late final int capacity;
   late Pointer<Uint8> ptr;
   bool _needFree = true;
-  NativeBytesBuilder(this._capacity) {
-    ptr = malloc.allocate(_capacity);
+  NativeBytesBuilder(this.capacity) {
+    ptr = malloc.allocate(capacity);
   }
 
-  NativeBytesBuilder._fromPointer(
-      Pointer<Uint8> this.ptr, this._capacity, this._pos) {
+  NativeBytesBuilder._fromPointer(this.ptr, this.capacity, this._pos) {
     _needFree = false;
   }
 
-  get capacity => _capacity;
-  get length => _pos;
+  int get length => _pos;
 
   List<int>? add(List<int> bytes) {
-    if (_pos >= _capacity) {
+    if (_pos >= capacity) {
       return bytes;
     }
     List<int>? remainder;
-    if (bytes.length > 0) {
-      var maxAllowed = _capacity - _pos;
+    if (bytes.isNotEmpty) {
+      var maxAllowed = capacity - _pos;
       if (maxAllowed < bytes.length) {
         remainder = bytes.sublist(maxAllowed);
       }
@@ -54,7 +52,7 @@ class NativeBytesBuilder {
 
   NativeBytesBuilder shift(int offset) {
     return NativeBytesBuilder._fromPointer(
-        ptr.elementAt(offset), _capacity - offset, _pos - offset);
+        ptr.elementAt(offset), capacity - offset, _pos - offset);
   }
 
   void free() {

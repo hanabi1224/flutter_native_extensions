@@ -59,7 +59,7 @@ typedef GetDistanceList = Pointer<Float> Function(Pointer);
 
 /// Factory to load pre-built annoy index
 class AnnoyIndexFactory {
-  DynamicLibrary _lib;
+  final DynamicLibrary _lib;
   AnnoyIndexFactory(this._lib) {
     _loadAnnoyIndex = _lib.lookupFunction<LoadAnnoyIndexNative, LoadAnnoyIndex>(
         'load_annoy_index');
@@ -91,7 +91,7 @@ class AnnoyIndexFactory {
   /// Load a pre-built annoy index, returns null if failed.
   AnnoyIndex? loadIndex(String path, int dimension, IndexType type) {
     var indexPtr = _loadAnnoyIndex(path.toNativeUtf8(), dimension, type.index);
-    if (indexPtr == 0) {
+    if (indexPtr.address == 0) {
       return null;
     }
     return AnnoyIndex._create(this, indexPtr, type);

@@ -177,7 +177,7 @@ class Lz4Lib {
           dstBuffer = malloc.allocate<Uint8>(estimateDstBufferSize);
         } else {
           var r = sourceBufferBuilder.add(chunk);
-          if (r != null && r.length > 0) {
+          if (r != null && r.isNotEmpty) {
             remainder.add(r);
           }
         }
@@ -214,7 +214,7 @@ class Lz4Lib {
             if (remainder.length > 0) {
               final r = sourceBufferBuilder.add(remainder.takeBytes());
               remainder.clear();
-              if (r != null && r.length > 0) {
+              if (r != null && r.isNotEmpty) {
                 remainder.add(r);
               }
             }
@@ -240,8 +240,8 @@ class Lz4Lib {
     }
   }
 
-  List<int> _magickHeader = [4, 34, 77, 24];
-  Map<int, int> _blockSizeTable = {
+  final List<int> _magickHeader = [4, 34, 77, 24];
+  final Map<int, int> _blockSizeTable = {
     4: 1024 * 64,
     5: 1024 * 256,
     6: 1024 * 1024,

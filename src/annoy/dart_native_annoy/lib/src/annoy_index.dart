@@ -12,8 +12,8 @@ part 'annoy_index_search_result.dart';
 
 /// Annoy index
 class AnnoyIndex {
-  AnnoyIndexFactory _factory;
-  Pointer _ptr;
+  final AnnoyIndexFactory _factory;
+  final Pointer _ptr;
   late final int dimension;
   late final int size;
   final IndexType type;
