@@ -141,7 +141,7 @@ Future _compileNative() async {
 
 Future _setupCompressed() async {
   final src = await File.fromUri(Uri.file('../dickens')).readAsBytesSync();
-  _compressed = _lz4!.compressFrame(Uint8List.fromList(src));
+  _compressed = _lz4!.compressFrame(src);
 }
 
 Stream<Uint8List> _splitDataIntoChunks(Uint8List data, int chunkSize) async* {
@@ -150,7 +150,7 @@ Stream<Uint8List> _splitDataIntoChunks(Uint8List data, int chunkSize) async* {
     final chunk = Uint8List.view(byteBuffer, chunkSize * i,
         min(byteBuffer.lengthInBytes - (chunkSize * i), chunkSize));
     if (chunk.length > 0) {
-      yield Uint8List.fromList(chunk);
+      yield chunk;
     } else {
       break;
     }

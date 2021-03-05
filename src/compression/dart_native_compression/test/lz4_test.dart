@@ -49,7 +49,7 @@ void main() async {
     // http://sun.aei.polsl.pl/~sdeor/index.php?page=silesia
     final src = await File.fromUri(Uri.file('dickens')).readAsBytesSync();
     print('src: ${src.length}');
-    final compressed = lz4.compressFrame(Uint8List.fromList(src));
+    final compressed = lz4.compressFrame(src);
     print('compressed: ${compressed.length}');
     assert(compressed.length > 0);
     final decompressed = lz4.decompressFrame(compressed);
@@ -61,7 +61,7 @@ void main() async {
     // http://sun.aei.polsl.pl/~sdeor/index.php?page=silesia
     final src = await File.fromUri(Uri.file('dickens')).readAsBytesSync();
     print('src: ${src.length}');
-    final compressed = lz4.compressFrame(Uint8List.fromList(src));
+    final compressed = lz4.compressFrame(src);
     print('compressed: ${compressed.length}');
     assert(compressed.length > 0);
 
@@ -84,7 +84,7 @@ void main() async {
     // http://sun.aei.polsl.pl/~sdeor/index.php?page=silesia
     final src = await File.fromUri(Uri.file('dickens')).readAsBytesSync();
     print('src: ${src.length}');
-    final compressed = lz4.compressFrame(Uint8List.fromList(src));
+    final compressed = lz4.compressFrame(src);
     print('compressed: ${compressed.length}');
     assert(compressed.length > 0);
 
@@ -110,7 +110,7 @@ Stream<Uint8List> _splitIntoChunks(Uint8List data, int chunkSize) async* {
     final chunk = Uint8List.view(byteBuffer, chunkSize * i,
         min(byteBuffer.lengthInBytes - (chunkSize * i), chunkSize));
     if (chunk.length > 0) {
-      yield Uint8List.fromList(chunk);
+      yield chunk;
     } else {
       break;
     }
