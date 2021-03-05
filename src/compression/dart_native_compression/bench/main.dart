@@ -91,7 +91,8 @@ class LZ4DecompressFrameBenchmark extends BenchmarkBase {
 }
 
 class LZ4DecompressFrameStreamBenchmark extends AsyncBenchmarkBase {
-  LZ4DecompressFrameStreamBenchmark() : super("decompressFrameStream");
+  LZ4DecompressFrameStreamBenchmark()
+      : super("decompressFrameStreamWithSmallChunk");
   Future run() async {
     final decompressedBuilder = BytesBuilder(copy: false);
     final compressedStream = _splitDataIntoChunks(_compressed!, 10);
@@ -103,7 +104,8 @@ class LZ4DecompressFrameStreamBenchmark extends AsyncBenchmarkBase {
 }
 
 class LZ4DecompressFrameStream2Benchmark extends AsyncBenchmarkBase {
-  LZ4DecompressFrameStream2Benchmark() : super("decompressFrameStream2");
+  LZ4DecompressFrameStream2Benchmark()
+      : super("decompressFrameStreamWithLargeChunk");
   Future run() async {
     final decompressedBuilder = BytesBuilder(copy: false);
     final compressedStream =

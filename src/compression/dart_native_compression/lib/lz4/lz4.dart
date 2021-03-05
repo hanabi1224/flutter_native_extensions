@@ -128,7 +128,7 @@ class Lz4Lib {
       srcSizePtr[0] = data.length;
       int srcPtrOffset = 0;
       int nextSrcSize = 0;
-      final decompressed = BytesBuilder();
+      final decompressed = BytesBuilder(copy: true);
       do {
         dstSizePtr[0] = estimateDstBufferSize;
         nextSrcSize = _decompressFrame(context, dstBuffer, dstSizePtr,
@@ -162,61 +162,54 @@ class Lz4Lib {
 
     var estimateDstBufferSize = 0;
 
-    Pointer<Uint8>? srcBuffer;
     Pointer<Uint8>? dstBuffer;
     int nextSrcSize = 0;
-    var sourceBufferBuilder = BytesBuilder();
-    var isFirstChunk = true;
+    NativeBytesBuilder? sourceBufferBuilder;
     try {
+      var remainder = BytesBuilder(copy: false);
+      var chunkId = -1;
       await for (final chunk in stream) {
-        if (isFirstChunk) {
-          isFirstChunk = false;
-          var srcBuffer = Uint8ArrayUtils.toPointer(chunk);
-          estimateDstBufferSize =
-              _validateFrameAndGetEstimatedDecodeBufferSize(chunk, srcBuffer);
+        chunkId += 1;
+        if (chunkId == 0) {
+          sourceBufferBuilder = NativeBytesBuilder(chunk.length);
+          sourceBufferBuilder.add(chunk);
+          estimateDstBufferSize = _validateFrameAndGetEstimatedDecodeBufferSize(
+              chunk, sourceBufferBuilder.ptr);
           dstBuffer = malloc.allocate<Uint8>(estimateDstBufferSize);
-        } else if (nextSrcSize == 0) {
-          return;
-        } else if (nextSrcSize < 0) {
-          throw Exception('Error: $nextSrcSize');
+        } else {
+          var r = sourceBufferBuilder!.add(chunk);
+          if (r.length > 0) {
+            remainder.add(r);
+          }
         }
 
-        sourceBufferBuilder.add(chunk);
-        while (sourceBufferBuilder.length >= nextSrcSize) {
-          if (srcBuffer != null) {
-            malloc.free(srcBuffer);
-            srcBuffer = null;
-          }
-          if (nextSrcSize == 0) {
-            srcBuffer =
-                Uint8ArrayUtils.toPointer(sourceBufferBuilder.toBytes());
-            srcSizePtr[0] = sourceBufferBuilder.length;
-          } else {
-            final tmpBuffer = sourceBufferBuilder.toBytes();
-            srcBuffer = Uint8ArrayUtils.toPointer(
-                Uint8List.view(tmpBuffer.buffer, 0, nextSrcSize));
-            srcSizePtr[0] = nextSrcSize;
-          }
+        while (sourceBufferBuilder!.length >= nextSrcSize) {
+          srcSizePtr[0] = sourceBufferBuilder.length;
           dstSizePtr[0] = estimateDstBufferSize;
-          nextSrcSize = _decompressFrame(
-              context, dstBuffer!, dstSizePtr, srcBuffer, srcSizePtr);
-          final consumedSrcSize = srcSizePtr[0];
-          if (consumedSrcSize >= sourceBufferBuilder.length) {
-            sourceBufferBuilder.clear();
-          } else {
-            final tmpBuffer = sourceBufferBuilder.takeBytes();
-            final remaining = Uint8List.view(tmpBuffer.buffer, consumedSrcSize,
-                tmpBuffer.length - consumedSrcSize);
-            sourceBufferBuilder.add(remaining);
-          }
-
+          nextSrcSize = _decompressFrame(context, dstBuffer!, dstSizePtr,
+              sourceBufferBuilder.ptr, srcSizePtr);
           final dstSize = dstSizePtr[0];
           final dstBufferView = dstBuffer.asTypedList(dstSize);
           final decompressedChunkBuilder = BytesBuilder(copy: true);
           decompressedChunkBuilder.add(dstBufferView);
           yield decompressedChunkBuilder.takeBytes();
-          if (nextSrcSize <= 0) {
-            break;
+          if (nextSrcSize > 0) {
+            final consumedSrcSize = srcSizePtr[0];
+            if (consumedSrcSize < sourceBufferBuilder.length) {
+              final view = sourceBufferBuilder.asTypedList();
+              remainder.add(view.sublist(consumedSrcSize));
+            }
+            sourceBufferBuilder.free();
+            sourceBufferBuilder = NativeBytesBuilder(nextSrcSize);
+            if (remainder.length > 0) {
+              final r = sourceBufferBuilder.add(remainder.takeBytes());
+              remainder.clear();
+              if (r.length > 0) {
+                remainder.add(r);
+              }
+            }
+          } else {
+            return;
           }
         }
       }
@@ -225,11 +218,11 @@ class Lz4Lib {
       malloc.free(contextPtr);
       malloc.free(dstSizePtr);
       malloc.free(srcSizePtr);
-      if (srcBuffer != null) {
-        malloc.free(srcBuffer);
-      }
       if (dstBuffer != null) {
         malloc.free(dstBuffer);
+      }
+      if (sourceBufferBuilder != null) {
+        sourceBufferBuilder.free();
       }
     }
   }
