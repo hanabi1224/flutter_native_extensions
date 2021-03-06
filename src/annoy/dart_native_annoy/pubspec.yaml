@@ -1,6 +1,6 @@
 name: dart_native_annoy
 description: A dart binding to native annoy library to serve pre-built Annoy index.
-version: 0.1.0
+version: 0.1.0+1
 homepage: https://github.com/hanabi1224/flutter_native_extensions/tree/master/src/annoy/dart_native_annoy
 publish_to: https://pub.dev/
 

@@ -28,21 +28,16 @@ class AnnoyIndex {
   }
 
   /// Get item vector with id
-  List<double> getItemVector(int itemId) {
-    final vecPtr = malloc.allocate<Float>(dimension);
-    try {
-      _factory._getItemVector(_ptr, itemId, vecPtr);
-      final list = vecPtr.asTypedList(dimension);
-      return List<double>.unmodifiable(list);
-    } finally {
-      malloc.free(vecPtr);
-    }
+  Float32List getItemVector(int itemId) {
+    final vecPtr = calloc.allocate<Float>(dimension * 4);
+    _factory._getItemVector(_ptr, itemId, vecPtr);
+    return vecPtr.asTypedList(dimension);
   }
 
   /// Get nearest items to the given vector
-  AnnoyIndexSearchResult getNearest(List<double> vector, int nResults,
+  AnnoyIndexSearchResult getNearest(Float32List vector, int nResults,
       {int searchK = -1, bool includeDistance = false}) {
-    final vecPtr = Float32List.fromList(vector).getPointer();
+    final vecPtr = vector.getPointer();
     try {
       final resultPtr = _factory._getNearest(
           _ptr, vecPtr, nResults, searchK, includeDistance ? 1 : 0);
