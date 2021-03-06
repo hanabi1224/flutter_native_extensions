@@ -1,4 +1,4 @@
-# dart_native_compression
+# dart_native_annoy
 [![Main](https://github.com/hanabi1224/flutter_native_extensions/actions/workflows/main.yml/badge.svg)](https://github.com/hanabi1224/flutter_native_extensions/actions/workflows/main.yml)
 ======
 
