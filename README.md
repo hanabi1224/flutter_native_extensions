@@ -7,3 +7,4 @@ This repo contains several extension packages for dart / flutter using great dar
 name | native | dart | flutter | packages |
 ---|---|---|--|--|
 lz4 compression | [native](https://github.com/hanabi1224/flutter_native_extensions/tree/master/src/compression/native_compression) | [dart](https://github.com/hanabi1224/flutter_native_extensions/tree/master/src/compression/dart_native_compression) | flutter | [![pub package](https://img.shields.io/pub/v/dart_native_compression.svg)](https://pub.dev/packages/dart_native_compression)
+annoy | [native](https://github.com/hanabi1224/RuAnnoy) | [dart](https://github.com/hanabi1224/flutter_native_extensions/tree/master/src/annoy/dart_native_annoy) | flutter | [![pub package](https://img.shields.io/pub/v/dart_native_annoy.svg)](https://pub.dev/packages/dart_native_annoy)
