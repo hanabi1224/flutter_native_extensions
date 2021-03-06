@@ -1,5 +1,9 @@
 # dart_native_compression
 
+## [1.1.0+3]
+
+fix lint warnings
+
 ## [1.1.0+2]
 
 perf optimizations
