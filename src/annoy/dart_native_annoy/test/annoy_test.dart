@@ -11,6 +11,7 @@ AnnoyIndex _loadIndex(indexFactory) {
 void main() async {
   final lib = await SetupUtil.getDylibAsync();
   final fac = AnnoyIndexFactory(lib);
+
   final expectedIdList = [0, 84, 16, 20, 49];
   final expectedDistanceList = [
     0.0,
@@ -30,6 +31,7 @@ void main() async {
     expect(100, index.size);
     index.close();
   });
+
   test('v3', () {
     final index = _loadIndex(fac);
     final v3 = index.getItemVector(3);

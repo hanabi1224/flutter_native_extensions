@@ -16,36 +16,36 @@ typedef GetDimension = int Function(Pointer);
 typedef GetSizeNative = Uint64 Function(Pointer);
 typedef GetSize = int Function(Pointer);
 
-/// fn get_item_vector(index_ptr: *const AnnoyIndex, item_index: i64, item_vector: *mut f32)
-typedef GetItemVectorNative = Void Function(Pointer, Int64, Pointer<Float>);
+/// fn get_item_vector(index_ptr: *const AnnoyIndex, item_index: u64, item_vector: *mut f32)
+typedef GetItemVectorNative = Void Function(Pointer, Uint64, Pointer<Float>);
 typedef GetItemVector = void Function(Pointer, int, Pointer<Float>);
 
 /// fn get_nearest(
 //     index_ptr: *const AnnoyIndex,
 //     query_vector_ptr: *const f32,
-//     n_results: size_t,
+//     n_results: u32,
 //     search_k: i32,
 //     should_include_distance: bool) -> *const AnnoyIndexSearchResult
 typedef GetNearestNative = Pointer Function(
-    Pointer, Pointer<Float>, Int64, Int32, Uint8);
+    Pointer, Pointer<Float>, Uint32, Int32, Uint8);
 typedef GetNearest = Pointer Function(Pointer, Pointer<Float>, int, int, int);
 
 /// fn get_nearest_to_item(
 //     index_ptr: *const AnnoyIndex,
-//     item_index: i64,
-//     n_results: size_t,
+//     item_index: u64,
+//     n_results: u32,
 //     search_k: i32,
 //     should_include_distance: bool,
 // ) -> *const AnnoyIndexSearchResult
 typedef GetNearestToItemNative = Pointer Function(
-    Pointer, Int64, Int64, Int32, Uint8);
+    Pointer, Uint64, Uint32, Int32, Uint8);
 typedef GetNearestToItem = Pointer Function(Pointer, int, int, int, int);
 
 /// fn free_search_result(search_result_ptr: *const AnnoyIndexSearchResult)
 typedef FreeSearchResultNative = Void Function(Pointer);
 typedef FreeSearchResult = void Function(Pointer);
 
-/// fn get_result_count(search_result_ptr: *const AnnoyIndexSearchResult) -> usize
+/// fn get_result_count(search_result_ptr: *const AnnoyIndexSearchResult) -> u64
 typedef GetResultCountNative = Uint64 Function(Pointer);
 typedef GetResultCount = int Function(Pointer);
 
