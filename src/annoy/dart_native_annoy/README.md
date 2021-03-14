@@ -39,6 +39,10 @@ install rust
 ```bash
 curl --proto '=https' --tlsv1.2 -sSf https://sh.rustup.rs | sh
 ```
+pull submodules
+```bash
+git submodule update --init --recursive
+```
 go to [RuAnnoy](https://github.com/hanabi1224/RuAnnoy/) directory, run
 ```bash
 cargo build --release --all-features
