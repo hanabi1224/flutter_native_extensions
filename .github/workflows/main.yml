@@ -7,9 +7,12 @@ name: Main
 
 on:
   push:
-    branches: [ master ]
+    branches: [master]
   pull_request:
-    branches: [ master ]
+    branches: [master]
+
+env:
+  RUSTFLAGS: -Ctarget-feature=+avx
 
 jobs:
   build:
@@ -23,6 +26,10 @@ jobs:
         with:
           toolchain: stable
           override: true
+      - uses: actions-rs/toolchain@v1
+        with:
+          toolchain: nightly
+          override: false
       - name: Compression
         run: |
           pushd src/compression/native_compression
@@ -41,8 +48,8 @@ jobs:
       - name: Annoy
         run: |
           pushd src/annoy/RuAnnoy
-          cargo build --release --all-features
-          cargo test --release --all-features -- --nocapture
+          cargo +nightly build --release --all-features
+          cargo +nightly test --release --all-features -- --nocapture
           popd
           pushd src/annoy/dart_native_annoy
           pub get

@@ -11,7 +11,7 @@ import 'dart:ffi';
 import 'package:dart_native_annoy/annoy.dart';
 
 /// Creat factory from DynamicLibrary
-final fac = AnnoyIndexFactory(lib: DynamicLibrary.open('libru_annoy.so'));
+final indexFactory = AnnoyIndexFactory(lib: DynamicLibrary.open('libru_annoy.so'));
 
 /// Load index
 final index = indexFactory.loadIndex(
@@ -45,7 +45,10 @@ git submodule update --init --recursive
 ```
 go to [RuAnnoy](https://github.com/hanabi1224/RuAnnoy/) directory, run
 ```bash
-cargo build --release --all-features
+# without simd
+cargo build --release
+# with simd
+RUSTFLAGS="-Ctarget-feature=+avx" cargo +nightly build --release --all-features
 ```
 to cross compile to different target
 ```bash
