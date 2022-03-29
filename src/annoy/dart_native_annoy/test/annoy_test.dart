@@ -12,13 +12,13 @@ void main() async {
   final lib = await SetupUtil.getDylibAsync();
   final fac = AnnoyIndexFactory(lib);
 
-  final expectedIdList = [0, 84, 16, 20, 49];
+  final expectedIdList = [0, 84, 20, 49, 94];
   final expectedDistanceList = [
     0.0,
     0.9348742961883545,
-    1.0476109981536865,
     1.1051676273345947,
     1.1057792901992798,
+    1.1299806833267212,
   ];
   test('dimension', () {
     final index = _loadIndex(fac);
@@ -49,30 +49,30 @@ void main() async {
     final index = _loadIndex(fac);
     final v0 = index.getItemVector(0);
     final nearest = index.getNearest(v0, 5, includeDistance: true);
-    expect(5, nearest.count);
-    expect(true, nearest.isDistanceIncluded);
-    expect(expectedIdList, nearest.idList);
-    expect(expectedDistanceList, nearest.distanceList);
+    expect(nearest.count, 5);
+    expect(nearest.isDistanceIncluded, true);
+    expect(nearest.idList, expectedIdList);
+    expect(nearest.distanceList, expectedDistanceList);
     index.close();
   });
 
   test('nearestToItem', () {
     final index = _loadIndex(fac);
     final nearest = index.getNearestToItem(0, 5, includeDistance: true);
-    expect(5, nearest.count);
-    expect(true, nearest.isDistanceIncluded);
-    expect(expectedIdList, nearest.idList);
-    expect(expectedDistanceList, nearest.distanceList);
+    expect(nearest.count, 5);
+    expect(nearest.isDistanceIncluded, true);
+    expect(nearest.idList, expectedIdList);
+    expect(nearest.distanceList, expectedDistanceList);
     index.close();
   });
 
   test('noDistance', () {
     final index = _loadIndex(fac);
     final nearest = index.getNearestToItem(0, 5, includeDistance: false);
-    expect(5, nearest.count);
-    expect(false, nearest.isDistanceIncluded);
-    expect(expectedIdList, nearest.idList);
-    expect([], nearest.distanceList);
+    expect(nearest.count, 5);
+    expect(nearest.isDistanceIncluded, false);
+    expect(nearest.idList, expectedIdList);
+    expect(nearest.distanceList, []);
     index.close();
   });
 }
