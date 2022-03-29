@@ -1,5 +1,9 @@
 # dart_native_compression
 
+## [1.1.0+4]
+
+fix lint warnings
+
 ## [1.1.0+3]
 
 fix lint warnings
@@ -19,4 +23,4 @@ Update readme and license
 
 ## [1.0.0] - dart binding to lz4 lib
 
-* LZ4 (v1.9.3) frame compression / decompression / stream decompression support
+- LZ4 (v1.9.3) frame compression / decompression / stream decompression support

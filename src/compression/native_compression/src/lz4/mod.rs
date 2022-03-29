@@ -1,27 +1,27 @@
-use libc::{c_char, c_int, c_uint, c_void, size_t};
-use std::ptr;
-
 mod native;
 use native::*;
 
+use libc::*;
+use std::ptr;
+
 #[no_mangle]
 pub extern "C" fn ffi_lz4_version_number() -> c_int {
-    return unsafe { LZ4_versionNumber() };
+    unsafe { LZ4_versionNumber() }
 }
 
 #[no_mangle]
 pub extern "C" fn ffi_lz4_version_string() -> *const c_char {
-    return unsafe { LZ4_versionString() };
+    unsafe { LZ4_versionString() }
 }
 
 #[no_mangle]
 pub extern "C" fn ffi_lz4f_get_version() -> c_uint {
-    return unsafe { LZ4F_getVersion() };
+    unsafe { LZ4F_getVersion() }
 }
 
 #[no_mangle]
 pub extern "C" fn ffi_lz4f_compress_frame_bound(src_size: size_t) -> size_t {
-    return unsafe { LZ4F_compressFrameBound(src_size, ptr::null()) };
+    unsafe { LZ4F_compressFrameBound(src_size, ptr::null()) }
 }
 
 #[no_mangle]
@@ -31,24 +31,22 @@ pub extern "C" fn ffi_lz4f_compress_frame(
     src_buffer: *const u8,
     src_size: size_t,
 ) -> size_t {
-    return unsafe {
-        LZ4F_compressFrame(dst_buffer, dst_capacity, src_buffer, src_size, ptr::null())
-    };
+    unsafe { LZ4F_compressFrame(dst_buffer, dst_capacity, src_buffer, src_size, ptr::null()) }
 }
 
 #[no_mangle]
 pub extern "C" fn ffi_lz4f_create_decompression_context(dctx_ptr: *mut size_t) -> size_t {
-    return unsafe { LZ4F_createDecompressionContext(dctx_ptr, ffi_lz4f_get_version()) };
+    unsafe { LZ4F_createDecompressionContext(dctx_ptr, ffi_lz4f_get_version()) }
 }
 
 #[no_mangle]
 pub fn ffi_lz4f_free_decompression_context(dctx: *mut c_void) -> size_t {
-    return unsafe { LZ4F_freeDecompressionContext(dctx) };
+    unsafe { LZ4F_freeDecompressionContext(dctx) }
 }
 
 #[no_mangle]
 pub extern "C" fn ffi_lz4f_header_size(src: *const u8, src_size: size_t) -> size_t {
-    return unsafe { LZ4F_headerSize(src, src_size) };
+    unsafe { LZ4F_headerSize(src, src_size) }
 }
 
 #[no_mangle]
@@ -58,7 +56,7 @@ pub extern "C" fn ffi_lz4f_get_frame_info(
     src_buffer: *const u8,
     src_size_ptr: *const size_t,
 ) -> size_t {
-    return unsafe { LZ4F_getFrameInfo(dctx, frame_info_ptr, src_buffer, src_size_ptr) };
+    unsafe { LZ4F_getFrameInfo(dctx, frame_info_ptr, src_buffer, src_size_ptr) }
 }
 
 #[no_mangle]
@@ -69,7 +67,7 @@ pub extern "C" fn ffi_lz4f_decompress(
     src_buffer: *const u8,
     src_size_ptr: *mut size_t,
 ) -> size_t {
-    return unsafe {
+    unsafe {
         LZ4F_decompress(
             dctx,
             dst_buffer,
@@ -78,7 +76,7 @@ pub extern "C" fn ffi_lz4f_decompress(
             src_size_ptr,
             ptr::null(),
         )
-    };
+    }
 }
 
 // Use cargo test -- --nocapture to show stdout/stderr

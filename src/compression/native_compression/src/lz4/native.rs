@@ -1,4 +1,4 @@
-use libc::{c_char, c_int, c_uint, c_void, size_t};
+use libc::*;
 
 // Full API doc: https://github.com/lz4/lz4/blob/v1.9.2/lib/lz4.h
 #[allow(non_snake_case)]

@@ -39,7 +39,7 @@ void main() async {
     final src = [1, 2, 3, 4, 5, 6, 7, 8, 9, 0, 9, 8, 7, 6, 5, 4, 3, 2, 1];
     final compressed = lz4.compressFrame(Uint8List.fromList(src));
     print(compressed);
-    assert(compressed.length > 0);
+    assert(compressed.isNotEmpty);
     final decompressed = lz4.decompressFrame(compressed);
     print(decompressed);
     assert(ListEquality().equals(src, decompressed));
@@ -47,11 +47,11 @@ void main() async {
 
   test('decompressFrameMultiBlock', () async {
     // http://sun.aei.polsl.pl/~sdeor/index.php?page=silesia
-    final src = await File.fromUri(Uri.file('dickens')).readAsBytesSync();
+    final src = File.fromUri(Uri.file('dickens')).readAsBytesSync();
     print('src: ${src.length}');
     final compressed = lz4.compressFrame(src);
     print('compressed: ${compressed.length}');
-    assert(compressed.length > 0);
+    assert(compressed.isNotEmpty);
     final decompressed = lz4.decompressFrame(compressed);
     print('decompressed: ${decompressed.length}');
     assert(ListEquality().equals(src, decompressed));
@@ -59,11 +59,11 @@ void main() async {
 
   test('decompressFrameStreamMultiBlockSmallChunk', () async {
     // http://sun.aei.polsl.pl/~sdeor/index.php?page=silesia
-    final src = await File.fromUri(Uri.file('dickens')).readAsBytesSync();
+    final src = File.fromUri(Uri.file('dickens')).readAsBytesSync();
     print('src: ${src.length}');
     final compressed = lz4.compressFrame(src);
     print('compressed: ${compressed.length}');
-    assert(compressed.length > 0);
+    assert(compressed.isNotEmpty);
 
     var decompressedChunkNumber = 0;
     final decompressedBuilder = BytesBuilder(copy: false);
@@ -82,11 +82,11 @@ void main() async {
 
   test('decompressFrameStreamMultiBlockLargeChunk', () async {
     // http://sun.aei.polsl.pl/~sdeor/index.php?page=silesia
-    final src = await File.fromUri(Uri.file('dickens')).readAsBytesSync();
+    final src = File.fromUri(Uri.file('dickens')).readAsBytesSync();
     print('src: ${src.length}');
     final compressed = lz4.compressFrame(src);
     print('compressed: ${compressed.length}');
-    assert(compressed.length > 0);
+    assert(compressed.isNotEmpty);
 
     var decompressedChunkNumber = 0;
     final decompressedBuilder = BytesBuilder(copy: false);
@@ -109,7 +109,7 @@ Stream<Uint8List> _splitIntoChunks(Uint8List data, int chunkSize) async* {
   for (var i = 0; chunkSize * i < byteBuffer.lengthInBytes; i++) {
     final chunk = Uint8List.view(byteBuffer, chunkSize * i,
         min(byteBuffer.lengthInBytes - (chunkSize * i), chunkSize));
-    if (chunk.length > 0) {
+    if (chunk.isNotEmpty) {
       yield chunk;
     } else {
       break;

@@ -20,10 +20,7 @@ class AsyncBenchmarkBase {
   final ScoreEmitter emitter;
 
   // Empty constructor.
-  const AsyncBenchmarkBase(String name,
-      {ScoreEmitter emitter: const PrintEmitter()})
-      : this.name = name,
-        this.emitter = emitter;
+  const AsyncBenchmarkBase(this.name, {this.emitter = const PrintEmitter()});
 
   // The benchmark code.
   // This function is not used, if both [warmup] and [exercise] are overwritten.
@@ -52,7 +49,7 @@ class AsyncBenchmarkBase {
   static Future<double> measureFor(Function f, int minimumMillis) async {
     int minimumMicros = minimumMillis * 1000;
     int iter = 0;
-    Stopwatch watch = new Stopwatch();
+    Stopwatch watch = Stopwatch();
     watch.start();
     int elapsed = 0;
     while (elapsed < minimumMicros) {
@@ -68,11 +65,11 @@ class AsyncBenchmarkBase {
     setup();
     // Warmup for at least 100ms. Discard result.
     measureFor(() async {
-      await this.warmup();
+      await warmup();
     }, 100);
     // Run the benchmark for at least 2000ms.
     double result = await measureFor(() async {
-      await this.exercise();
+      await exercise();
     }, 2000);
     teardown();
     return result;
@@ -85,6 +82,7 @@ class AsyncBenchmarkBase {
 
 class LZ4DecompressFrameBenchmark extends BenchmarkBase {
   LZ4DecompressFrameBenchmark() : super("decompressFrameOneShot");
+  @override
   void run() {
     _lz4!.decompressFrame(_compressed!);
   }
@@ -93,6 +91,7 @@ class LZ4DecompressFrameBenchmark extends BenchmarkBase {
 class LZ4DecompressFrameStreamBenchmark extends AsyncBenchmarkBase {
   LZ4DecompressFrameStreamBenchmark()
       : super("decompressFrameStreamWithSmallChunk");
+  @override
   Future run() async {
     final decompressedBuilder = BytesBuilder(copy: true);
     final compressedStream = _splitDataIntoChunks(_compressed!, 11);
@@ -106,6 +105,7 @@ class LZ4DecompressFrameStreamBenchmark extends AsyncBenchmarkBase {
 class LZ4DecompressFrameStream2Benchmark extends AsyncBenchmarkBase {
   LZ4DecompressFrameStream2Benchmark()
       : super("decompressFrameStreamWithLargeChunk");
+  @override
   Future run() async {
     final decompressedBuilder = BytesBuilder(copy: true);
     final compressedStream =
@@ -140,7 +140,7 @@ Future _compileNative() async {
 }
 
 Future _setupCompressed() async {
-  final src = await File.fromUri(Uri.file('../dickens')).readAsBytesSync();
+  final src = File.fromUri(Uri.file('../dickens')).readAsBytesSync();
   _compressed = _lz4!.compressFrame(src);
 }
 
@@ -149,7 +149,7 @@ Stream<Uint8List> _splitDataIntoChunks(Uint8List data, int chunkSize) async* {
   for (var i = 0; chunkSize * i < byteBuffer.lengthInBytes; i++) {
     final chunk = Uint8List.view(byteBuffer, chunkSize * i,
         min(byteBuffer.lengthInBytes - (chunkSize * i), chunkSize));
-    if (chunk.length > 0) {
+    if (chunk.isNotEmpty) {
       yield chunk;
     } else {
       break;
