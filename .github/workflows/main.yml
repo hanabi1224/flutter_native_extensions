@@ -33,26 +33,22 @@ jobs:
       - name: Compression
         run: |
           pushd src/compression/native_compression
-          cargo build --release --all-features
+          cargo clippy --release --all-features
           cargo test --release --all-features -- --nocapture
           popd
           pushd src/compression/dart_native_compression
-          pub get
+          dart pub get
           dart run test
           dart analyze lib
           popd
           pushd src/compression/dart_native_compression/bench
-          pub get
+          dart pub get
           dart run main.dart
           popd
       - name: Annoy
         run: |
-          pushd src/annoy/RuAnnoy
-          cargo +nightly build --release --all-features
-          cargo +nightly test --release --all-features -- --nocapture
-          popd
           pushd src/annoy/dart_native_annoy
-          pub get
+          dart pub get
           dart run test
           dart analyze lib
           popd

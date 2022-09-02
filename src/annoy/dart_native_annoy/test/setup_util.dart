@@ -4,7 +4,7 @@ import 'dart:io';
 final _dylibPrefix = Platform.isWindows ? '' : 'lib';
 final _dylibExtension =
     Platform.isWindows ? '.dll' : (Platform.isMacOS ? '.dylib' : '.so');
-final _dylibName = '${_dylibPrefix}annoy_rs$_dylibExtension';
+final _dylibName = '${_dylibPrefix}annoy_rs_ffi$_dylibExtension';
 DynamicLibrary? _dylib;
 
 class SetupUtil {
@@ -20,8 +20,18 @@ class SetupUtil {
 
     final nativeDir = '../RuAnnoy';
     await Process.run(
-        'cargo', ['+nightly', 'build', '--release', '--verbose', '--all-features'],
-        workingDirectory: nativeDir);
+        'cargo',
+        [
+          '+nightly',
+          'build',
+          '-p',
+          'annoy-rs-ffi',
+          '--release',
+          '--verbose',
+          '--all-features'
+        ],
+        workingDirectory: nativeDir,
+        environment: {'RUSTFLAGS': '-Ctarget-feature=+avx'});
     final dylibPath =
         '${Directory.current.absolute.path}/$nativeDir/target/release/$_dylibName';
     _dylib = DynamicLibrary.open(Uri.file(dylibPath).toFilePath());

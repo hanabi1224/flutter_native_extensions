@@ -11,7 +11,7 @@ import 'dart:ffi';
 import 'package:dart_native_annoy/annoy.dart';
 
 /// Creat factory from DynamicLibrary
-final indexFactory = AnnoyIndexFactory(lib: DynamicLibrary.open('libru_annoy.so'));
+final indexFactory = AnnoyIndexFactory(lib: DynamicLibrary.open('libannoy_rs_ffi.so'));
 
 /// Load index
 final index = indexFactory.loadIndex(
